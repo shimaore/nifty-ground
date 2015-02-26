@@ -4,6 +4,7 @@
 
     trace_couch = require './trace_couch'
     cleanup = require './cleanup'
+    pkg = require '../package.json'
     hostname = process.env.HOSTNAME
     client = (require 'socket.io-client') process.env.SOCKET
     hourly = 60*60*1000
