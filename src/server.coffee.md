@@ -2,6 +2,7 @@
     assert process.env.SOCKET?, 'The SOCKET environment variale is required.'
     assert process.env.HOSTNAME?, 'The HOSTNAME environment variale is required.'
 
+    Promise = require 'bluebird'
     trace_couch = require './trace_couch'
     cleanup = require './cleanup'
     pkg = require '../package.json'
