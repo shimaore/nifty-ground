@@ -141,7 +141,7 @@ The idea is that we produce _some_ input even if we can't read all the files.
           null
 
         .then (files) ->
-          Promise.filter (x) -> x?.time?
+          files.filter (x) -> x?.time?
 
         .then (proper_files) ->
           proper_files.sort (a,b) -> a.time - b.time
@@ -170,7 +170,9 @@ We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
 
         .then (stash) ->
           console.log "Going to write #{stash.length} packets to #{fh}."
-          pcap_tail.write fs.createWriteStream(fh), stash, run_tshark
+          pcap_tail.write fs.createWriteStream(fh), stash
+          .then ->
+            run_tshark()
 
         ## Select the proper packets
         if options.pcap?

@@ -9,6 +9,8 @@
 
     default_workdir = path.join process.cwd(), 'pcap'
 
+    class TraceError extends Error
+
 The server filters and formats the trace.
 
     module.exports = (doc) ->
@@ -17,7 +19,8 @@ The server filters and formats the trace.
 
 Stubbornly refuse to print out all packets.
 
-      return unless doc.to_user? or doc.from_user? or doc.call_id? or doc.ip?
+      unless doc.to_user? or doc.from_user? or doc.call_id? or doc.ip?
+        throw new TraceError 'Either one of `to_user`, `from_user`, `call_id`, or `ip` is a required parameter.'
 
 # Generate a merged capture file
 

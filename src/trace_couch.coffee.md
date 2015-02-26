@@ -7,6 +7,7 @@ This allows for storage of large responses (a potential issue with AMQP).
 Also this allows to directly access the raw PCAP output without sending
 the request a second time.
 
+    assert = require 'assert'
     request = require 'superagent-as-promised'
     PouchDB = require 'pouchdb'
 
