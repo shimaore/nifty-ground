@@ -22,6 +22,8 @@ Wait for a trace request.
         trace_couch doc
         .then ->
           client.emit 'notify_users', type:'trace', host:hostname, in_reply_to:doc
+        .catch (error) ->
+          client.emit 'notify_users', type:'trace-error', host:hostname, in_reply_to:doc, error:error.toString()
 
 Cleanup the trace directory every hour.
 

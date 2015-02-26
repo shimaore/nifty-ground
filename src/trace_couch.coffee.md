@@ -18,8 +18,7 @@ the request a second time.
     fs = Promise.promisifyAll require 'fs'
 
     module.exports = (doc) ->
-
-      return unless doc.reference?
+      assert doc.reference?, '`reference` parameter is required'
 
       uri = doc.upload_uri ? process.env.UPLOAD
 
