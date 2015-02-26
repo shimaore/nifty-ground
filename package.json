@@ -1,25 +1,24 @@
 {
-  "name": "ccnq3_traces",
-  "version": "0.0.2",
+  "name": "nifty-ground",
+  "version": "1.0.0",
   "description": "SIP sniffer traces",
   "keywords": "",
-  "author": { "name": "Stephane Alnet", "email": "stephane@shimaore.net" },
-  "config": {
-    "file": "/etc/ccnq3/host.json"
-  },
-  "scripts": {
-    "start": "./start.coffee; daemon -n ccnq3_trace_server -o daemon.debug -D \"`pwd`/agents\" -r -- ./amqp_agent.coffee"
-  , "stop": "./stop.coffee; daemon -n ccnq3_trace_server -o daemon.debug --stop"
+  "author": {
+    "name": "Stephane Alnet",
+    "email": "stephane@shimaore.net"
   },
   "dependencies": {
-    "ccnq3": ">=0.3.3"
-  , "pico": ">=0.1.0"
-  , "byline": ">=2.0.3"
-  , "stream-buffers": "*"
-  , "pcap-parser": "*"
+    "bluebird": "^2.9.12",
+    "byline": "^4.2.1",
+    "debug": "^2.1.1",
+    "pcap-parser": "*",
+    "pouchdb": "^3.3.1",
+    "socket.io-client": "^1.3.4",
+    "stream-buffers": "*",
+    "superagent-as-promised": "^2.0.0"
   },
-  "engines": { "node": ">=0.6.6", "coffee": ">=1.1.2" },
-
   "private": true,
-  "ok": true
+  "devDependencies": {
+    "coffee-script": "^1.9.1"
+  }
 }

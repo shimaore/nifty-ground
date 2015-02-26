@@ -1,41 +1,56 @@
-# Concept: the response is stored as a CouchDB record
-# with the original request as main doc
-# plus the JSON content as `packets`
-# plus the PCAP content as attachment `packets.pcap`
-#
-# This allows for storage of large responses (a potential issue with AMQP).
-# Also this allows to directly access the raw PCAP output without sending
-# the request a second time.
+Concept: the response is stored as a CouchDB record
+with the original request as main doc
+plus the JSON content as `packets`
+plus the PCAP content as attachment `packets.pcap`
 
-ccnq3 = require 'ccnq3'
-pico = require 'pico'
-json_gather = require './json_gather'
-trace = require './trace'
-qs = require 'querystring'
-fs = require 'fs'
+This allows for storage of large responses (a potential issue with AMQP).
+Also this allows to directly access the raw PCAP output without sending
+the request a second time.
 
-module.exports = (config,doc) ->
+    request = require 'superagent-as-promised'
+    PouchDB = require 'pouchdb'
 
-  return unless doc.reference?
+    json_gather = require './json_gather'
+    trace = require './trace'
+    qs = require 'querystring'
+    url = require 'url'
+    Promise = require 'bluebird'
+    fs = Promise.promisifyAll require 'fs'
 
-  dest = pico doc.upload_uri ? config.traces.upload_uri
-  [self,pcap] = trace config, doc
+    module.exports = (doc) ->
 
-  doc.type = 'trace'
-  doc.host = config.host
-  doc._id = [doc.type, doc.reference, doc.host].join ':'
+      return unless doc.reference?
 
-  json_gather self, (packets) ->
-    doc.packets = packets
-    dest.put doc, (e,r,b) ->
-      if e?
-        console.log e
-        return
-      if b?.rev?
-        uri = "#{qs.escape doc._id}/packets.pcap?rev=#{b.rev}"
-        options =
-          headers:
-            'Content-Type': 'application/vnd.tcpdump.pcap'
-        fs.createReadStream(pcap).pipe dest.request.put uri, (e,r,b) ->
-          fs.unlink pcap, (err) ->
-            console.dir error:err, when: "unlink #{pcap}"
+      uri = doc.upload_uri ? process.env.UPLOAD
+
+      dest = new PouchDB uri
+      [self,pcap] = trace doc
+
+      doc.type = 'trace'
+      doc.host = process.env.HOSTNAME
+      doc._id = [doc.type, doc.reference, doc.host].join ':'
+
+      json_gather self
+      .then (packets) ->
+        doc.packets = packets
+        dest.put doc
+      .then ->
+        return unless b?.rev?
+
+We cannot use PouchDB's attachment methods because they would require to store the object in memory in a Buffer.
+
+        uri = url.resolve "#{uri}/", "#{qs.escape doc._id}/packets.pcap"
+        req = request
+          .put uri
+          .query rev: b.rev
+          .type 'application/vnd.tcpdump.pcap'
+        fs.createReadStream(pcap).pipe req
+        req
+
+Note: currently this will only unlink if the PUT was successful.
+FIXME: Retry the PUT once if it failed.
+
+      .then ->
+        fs.unlinkAsync pcap
+      .catch (error) ->
+        console.dir {error, when: ''}

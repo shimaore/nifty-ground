@@ -1,14 +1,23 @@
-# json_gather.coffee
-# (c) 2012 Stephane Alnet
+(c) 2012-2015 Stephane Alnet
 
-module.exports = (self,cb) ->
+    Promise = require 'bluebird'
 
-  res = []
+    module.exports = (self) ->
 
-  self.on 'data', (data) ->
-    res.push data
+Aggregate the contents received via `data` events into an Array.
 
-  self.on 'end', ->
-    cb res
+      new Promise (resolve,reject) ->
+        try
+          res = []
 
-  return
+          self.on 'data', (data) ->
+            res.push data
+
+          self.on 'end', ->
+
+Returns a Promise that resolves into the Array.
+
+            resolve res
+        catch error
+          reject error
+        return
