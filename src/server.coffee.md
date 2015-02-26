@@ -19,11 +19,13 @@ Wait for a trace request.
 
       client.on 'trace', (doc) ->
         console.log "#{pkg.name} #{pkg.version} received trace request #{JSON.stringify doc}"
-        trace_couch doc
+        Promise.resolve()
         .then ->
-          client.emit 'notify_users', type:'trace', host:hostname, in_reply_to:doc
+          trace_couch doc
+        .then ->
+          client.emit 'trace_completed', host:hostname, in_reply_to:doc
         .catch (error) ->
-          client.emit 'notify_users', type:'trace-error', host:hostname, in_reply_to:doc, error:error.toString()
+          client.emit 'trace_error', host:hostname, in_reply_to:doc, error:error.toString()
 
 Cleanup the trace directory every hour.
 

@@ -18,9 +18,10 @@ the request a second time.
     fs = Promise.promisifyAll require 'fs'
 
     module.exports = (doc) ->
-      assert doc.reference?, '`reference` parameter is required'
+      assert doc.reference?, 'The `reference` parameter is required'
 
       uri = doc.upload_uri ? process.env.UPLOAD
+      assert uri?, 'Either the `upload_uri` parameter or the UPLOAD environment variable is required.'
 
       dest = new PouchDB uri
       [self,pcap] = trace doc
