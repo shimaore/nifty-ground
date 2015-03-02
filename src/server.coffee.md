@@ -4,13 +4,45 @@
 
     Promise = require 'bluebird'
     trace_couch = require './trace_couch'
-    cleanup = require './cleanup'
     pkg = require '../package.json'
     hostname = process.env.HOSTNAME
-    client = (require 'socket.io-client') process.env.SOCKET
+
+Cleanup the trace directory every hour
+--------------------------------------
+
+    cleanup = require './cleanup'
     hourly = 60*60*1000
 
-    do ->
+    setInterval ->
+      try
+        cleanup
+      catch error
+        debug "Cleanup: #{error}"
+    , hourly
+
+Request handler
+---------------
+
+    main = ->
+
+      client = (require 'socket.io-client') process.env.SOCKET
+
+      client.on 'connect', ->
+        debug 'connect'
+      client.on 'disconnect', ->
+        debug 'disconnect'
+      client.on 'connect_timeout', ->
+        debug 'connect_timeout'
+      client.on 'reconnect', ->
+        debug 'reconnect'
+      client.on 'reconnect_attempt', ->
+        debug 'reconnect_attempt'
+      client.on 'reconnecting', ->
+        debug 'reconnecting'
+      client.on 'reconnect_error', ->
+        debug 'reconnect_error'
+      client.on 'reconnect_failed', ->
+        debug 'reconnect_failed'
 
 Configure (see the [spicy-action service](https://github.com/shimaore/spicy-action/blob/master/index.coffee.md) for options).
 
@@ -29,8 +61,6 @@ Wait for a trace request.
         .catch (error) ->
           client.emit 'trace_error', host:hostname, in_reply_to:doc, error:error.toString()
 
-Cleanup the trace directory every hour.
-
-      setInterval cleanup, hourly
-
       console.log "#{pkg.name} #{pkg.version} ready on #{hostname}"
+
+    do main
