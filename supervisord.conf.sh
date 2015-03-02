@@ -16,7 +16,7 @@ pidfile=%(here)s/log/supervisord.pid
 loglevel=debug
 
 [inet_http_server]
-port=127.0.0.1:5700
+port=127.0.0.1:5701
 
 [rpcinterface:supervisor]
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
