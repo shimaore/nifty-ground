@@ -28,4 +28,4 @@ RUN mkdir -p log pcap
 RUN npm install
 RUN npm install coffee-script
 
-CMD ['/opt/nifty-ground/supervisord.conf.sh']
+CMD ["/opt/nifty-ground/supervisord.conf.sh"]
