@@ -1,10 +1,12 @@
+    pkg = require '../package.json'
+    debug = (require 'debug') "#{pkg.name}:server"
+
     assert = require 'assert'
     assert process.env.SOCKET?, 'The SOCKET environment variale is required.'
     assert process.env.HOSTNAME?, 'The HOSTNAME environment variale is required.'
 
     Promise = require 'bluebird'
     trace_couch = require './trace_couch'
-    pkg = require '../package.json'
     hostname = process.env.HOSTNAME
 
 Cleanup the trace directory every hour
