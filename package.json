@@ -19,6 +19,13 @@
   },
   "private": true,
   "devDependencies": {
-    "coffee-script": "^1.9.1"
+    "chai": "^2.1.0",
+    "chai-as-promised": "^4.2.0",
+    "coffee-script": "^1.9.1",
+    "mocha": "^2.1.0"
+  },
+  "scripts": {
+    "pretest": "npm install",
+    "test": "mocha"
   }
 }

@@ -17,3 +17,9 @@ Environment parameters:
 * RINGSIZE: optional, how many 1Mo files to keep.
 * FILESIZE: optional, file size if different from 1Mo.
 * FILTER: optional, dumpcap capture filter.
+
+Format
+------
+
+Since the `pcap-parser` library only supports old (plain) `pcap` format and not the (newer) `pcap-ng` format, we must dump per interface (`dumpcap` will enforce `pcap-ng` format for multiple interfaces captures).
+The capture must be done using a 65535 size to avoid issues with mixing files of differing snapshot lengths.
