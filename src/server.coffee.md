@@ -9,19 +9,6 @@
     trace_couch = require './trace_couch'
     hostname = process.env.HOSTNAME
 
-Cleanup the trace directory every hour
---------------------------------------
-
-    cleanup = require './cleanup'
-    hourly = 60*60*1000
-
-    setInterval ->
-      try
-        cleanup
-      catch error
-        debug "Cleanup: #{error}"
-    , hourly
-
 Request handler
 ---------------
 

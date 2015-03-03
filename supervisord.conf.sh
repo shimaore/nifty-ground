@@ -27,6 +27,12 @@ priority=40
 autorestart=true
 redirect_stderr=true
 
+[program:periodic]
+command=%(here)s/node_modules/.bin/coffee %(here)s/src/periodic.coffee.md
+priority=60
+autorestart=true
+redirect_stderr=true
+
 CONF
 
 for intf in ${INTERFACES}; do
