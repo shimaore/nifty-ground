@@ -18,6 +18,11 @@ Request handler
 
       client.on 'connect', ->
         debug 'connect'
+
+Configure (see the [spicy-action service](https://github.com/shimaore/spicy-action/blob/master/index.coffee.md) for options).
+
+        client.emit 'configure', traces:yes
+
       client.on 'disconnect', ->
         debug 'disconnect'
       client.on 'connect_timeout', ->
@@ -32,10 +37,6 @@ Request handler
         debug 'reconnect_error'
       client.on 'reconnect_failed', ->
         debug 'reconnect_failed'
-
-Configure (see the [spicy-action service](https://github.com/shimaore/spicy-action/blob/master/index.coffee.md) for options).
-
-      client.emit 'configure', traces:yes
 
 Wait for a trace request.
 
