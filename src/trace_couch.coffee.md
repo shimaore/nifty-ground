@@ -8,7 +8,7 @@ Also this allows to directly access the raw PCAP output without sending
 the request a second time.
 
     assert = require 'assert'
-    request = require 'superagent-as-promised'
+    request = (require 'superagent-as-promised') require 'superagent'
     PouchDB = require 'pouchdb'
 
     json_gather = require './json_gather'
