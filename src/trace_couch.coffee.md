@@ -8,7 +8,7 @@ Also this allows to directly access the raw PCAP output without sending
 the request a second time.
 
     assert = require 'assert'
-    request = (require 'superagent-as-promised') require 'superagent'
+    request = require 'request'
     PouchDB = require 'pouchdb'
 
     json_gather = require './json_gather'
@@ -39,25 +39,28 @@ the request a second time.
 
 We cannot use PouchDB's attachment methods because they would require to store the object in memory in a Buffer.
 
-        uri = url.resolve "#{uri}/", "#{qs.escape doc._id}/packets.pcap"
         stream = fs.createReadStream pcap
-        req = request
-          .put uri
-          .query rev: b.rev
-          .type 'application/vnd.tcpdump.pcap'
-          .accept 'json'
-          .timeout 60000
+        req = request.put
+          baseUrl: uri
+          uri: "#{qs.escape doc._id}/packets.pcap"
+          qs:
+            rev: b.rev
+          headers:
+            'Content-Type': 'application/vnd.tcpdump.pcap'
+            'Accept': 'json'
+          timeout: 60000
 
-        console.log "Going to save #{pcap} to #{uri}"
-        stream.pipe req
-        console.log "Piping #{pcap} to #{uri}"
-        req
+        req.on 'error', (error) ->
+          console.dir {error, when: ''}
 
 Note: currently this will only unlink if the PUT was successful.
 FIXME: Retry the PUT once if it failed.
 
-      .then (res) ->
-        console.log "Done saving to #{uri}, ok=#{res.ok}, text=#{res.text}"
-        fs.unlinkAsync pcap
-      .catch (error) ->
-        console.dir {error, when: ''}
+        req.on 'response', (res) ->
+          console.log "Done saving to #{uri}, ok=#{res.ok}, text=#{res.text}"
+          fs.unlinkAsync pcap
+
+        console.log "Going to save #{pcap} to #{uri}"
+        stream.pipe req
+        console.log "Piping #{pcap} to #{uri}"
+        null
