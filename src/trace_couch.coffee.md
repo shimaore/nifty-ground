@@ -41,10 +41,14 @@ We cannot use PouchDB's attachment methods because they would require to store t
 
         uri = url.resolve "#{uri}/", "#{qs.escape doc._id}/packets.pcap"
         console.log "Going to save to #{uri}"
-        req = request
+        request
           .put uri
           .query rev: b.rev
           .type 'application/vnd.tcpdump.pcap'
+          .accept 'json'
+          .timeout 60000
+
+      .then (req) ->
         fs.createReadStream(pcap).pipe req
         req
 
