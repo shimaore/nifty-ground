@@ -40,16 +40,17 @@ the request a second time.
 We cannot use PouchDB's attachment methods because they would require to store the object in memory in a Buffer.
 
         uri = url.resolve "#{uri}/", "#{qs.escape doc._id}/packets.pcap"
-        console.log "Going to save to #{uri}"
-        request
+        stream = fs.createReadStream pcap
+        req = request
           .put uri
           .query rev: b.rev
           .type 'application/vnd.tcpdump.pcap'
           .accept 'json'
           .timeout 60000
 
-      .then (req) ->
-        fs.createReadStream(pcap).pipe req
+        console.log "Going to save #{pcap} to #{uri}"
+        stream.pipe req
+        console.log "Piping #{pcap} to #{uri}"
         req
 
 Note: currently this will only unlink if the PUT was successful.
