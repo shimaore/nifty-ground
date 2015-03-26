@@ -8,22 +8,22 @@
     "email": "stephane@shimaore.net"
   },
   "dependencies": {
-    "bluebird": "^2.9.12",
+    "bluebird": "^2.9.14",
     "byline": "^4.2.1",
-    "debug": "^2.1.2",
+    "debug": "^2.1.3",
     "pcap-parser": "0.2.1",
     "pouchdb": "^3.3.1",
-    "socket.io-client": "^1.3.4",
-    "stream-buffers": "*",
+    "socket.io-client": "^1.3.5",
+    "stream-buffers": "^2.1.0",
     "superagent": "^1.1.0",
     "superagent-as-promised": "^3.0.0"
   },
   "private": true,
   "devDependencies": {
-    "chai": "^2.1.0",
-    "chai-as-promised": "^4.2.0",
+    "chai": "^2.1.2",
+    "chai-as-promised": "^4.3.0",
     "coffee-script": "^1.9.1",
-    "mocha": "^2.1.0"
+    "mocha": "^2.2.1"
   },
   "scripts": {
     "pretest": "npm install",
