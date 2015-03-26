@@ -35,8 +35,7 @@ the request a second time.
       .then (packets) ->
         doc.packets = packets
         dest.put doc
-      .then ->
-        return unless b?.rev?
+      .then (b) ->
 
 We cannot use PouchDB's attachment methods because they would require to store the object in memory in a Buffer.
 
