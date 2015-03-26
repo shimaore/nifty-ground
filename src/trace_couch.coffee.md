@@ -41,6 +41,7 @@ the request a second time.
 We cannot use PouchDB's attachment methods because they would require to store the object in memory in a Buffer.
 
         uri = url.resolve "#{uri}/", "#{qs.escape doc._id}/packets.pcap"
+        console.log "Going to save to #{uri}"
         req = request
           .put uri
           .query rev: b.rev
@@ -51,7 +52,8 @@ We cannot use PouchDB's attachment methods because they would require to store t
 Note: currently this will only unlink if the PUT was successful.
 FIXME: Retry the PUT once if it failed.
 
-      .then ->
+      .then (res) ->
+        console.log "Done saving to #{uri}, ok=#{res.ok}, text=#{res.text}"
         fs.unlinkAsync pcap
       .catch (error) ->
         console.dir {error, when: ''}
