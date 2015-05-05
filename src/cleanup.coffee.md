@@ -68,3 +68,7 @@ Sort by ascending timestamp, oldest first.
               full = path.join trace_dir, a.name
               debug "gzip #{full}"
               spawn '/bin/gzip', [full], stdio:'ignore'
+
+      .catch (error) ->
+        console.error "cleanup: #{error} while processing #{trace_dir}"
+        null

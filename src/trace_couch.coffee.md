@@ -59,6 +59,8 @@ FIXME: Retry the PUT once if it failed.
         req.on 'response', (res) ->
           console.log "Done saving to #{uri}, ok=#{res.ok}, text=#{res.text}"
           fs.unlinkAsync pcap
+          .catch (error) ->
+            console.log "#{error} while unlinking #{pcap}"
 
         console.log "Going to save #{pcap} to #{uri}"
         stream.pipe req

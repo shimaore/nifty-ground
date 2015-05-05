@@ -174,6 +174,10 @@ We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
           .then ->
             run_tshark()
 
+        .catch (error) ->
+          console.error "server: #{error} while processing #{trace_dir}"
+          null
+
         ## Select the proper packets
         if options.pcap?
           tshark_command = [
