@@ -2,11 +2,8 @@
   "name": "nifty-ground",
   "version": "1.4.1",
   "description": "SIP sniffer traces",
-  "keywords": "",
-  "author": {
-    "name": "Stephane Alnet",
-    "email": "stephane@shimaore.net"
-  },
+  "keywords": ["SIP","sniffer","traces","ethereal-banana"],
+  "author": "Stephane Alnet <stephane@shimaore.net>",
   "dependencies": {
     "bluebird": "^2.9.14",
     "byline": "^4.2.1",
@@ -27,5 +24,18 @@
   "scripts": {
     "pretest": "npm install",
     "test": "mocha"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shimaore/nifty-ground.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shimaore/nifty-ground/issues"
+  },
+  "homepage": "https://github.com/shimaore/nifty-ground",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "license": "Unlicense (http://unlicense.org/)"
 }
