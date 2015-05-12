@@ -9,7 +9,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
   gzip \
   procps \
   supervisor \
-  'tshark=1.12.1+g01b65bf-3'
+  'tshark=1.12.4+gb4861da-1'
 
 # Dumpcap can be installed in a way that allows members of the "wireshark" system
 # group to capture packets. This is recommended over the alternative of running
