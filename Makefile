@@ -13,13 +13,10 @@ image:
 
 image-no-cache:
 	docker build --rm=true --no-cache -t ${NAME}:${TAG} .
-	docker tag ${NAME}:${TAG} ${NAME}:latest
 
 tests:
 	npm test
 
 push: image tests
 	docker push ${REGISTRY}/${NAME}:${TAG}
-	docker push ${REGISTRY}/${NAME}:latest
 	docker push ${NAME}:${TAG}
-	docker push ${NAME}:latest
