@@ -1,8 +1,13 @@
 {
   "name": "nifty-ground",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "SIP sniffer traces",
-  "keywords": ["SIP","sniffer","traces","ethereal-banana"],
+  "keywords": [
+    "SIP",
+    "sniffer",
+    "traces",
+    "ethereal-banana"
+  ],
   "author": "Stephane Alnet <stephane@shimaore.net>",
   "dependencies": {
     "bluebird": "^2.9.14",
