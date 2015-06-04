@@ -4,6 +4,8 @@
     {isIPv4,isIPv6} = require 'net'
     packet_server = require './packet_server'
     wireshark_date = require './wireshark_date'
+    pkg = require '../package.json'
+    debug = (require 'debug') "#{pkg}:trace"
 
 # Host trace server
 
@@ -15,7 +17,7 @@ The server filters and formats the trace.
 
     module.exports = (doc) ->
 
-      console.dir doc: doc
+      debug "start", doc
 
 Stubbornly refuse to print out all packets.
 

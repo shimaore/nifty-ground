@@ -21,6 +21,7 @@ the request a second time.
     debug = (require 'debug') "#{pkg}:trace_couch"
 
     module.exports = (doc) ->
+      debug "start", doc
       assert doc.reference?, 'The `reference` parameter is required'
 
       uri = doc.upload_uri ? process.env.UPLOAD

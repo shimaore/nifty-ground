@@ -78,6 +78,8 @@ it will trigger three event types:
 
     module.exports = (options) ->
 
+      debug "start", options
+
       trace_dir = options.trace_dir
 
       self = new EventEmitter
@@ -107,6 +109,8 @@ it will trigger three event types:
         return
 
       run = (intf) ->
+
+        debug "run", intf
 
 We _have_ to use a file because tshark cannot read from a pipe/fifo/stdin.
 (And we need tshark for its filtering and field selection features.)
