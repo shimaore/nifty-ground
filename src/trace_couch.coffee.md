@@ -17,6 +17,8 @@ the request a second time.
     url = require 'url'
     Promise = require 'bluebird'
     fs = Promise.promisifyAll require 'fs'
+    pkg = require '../package.json'
+    debug = (require 'debug') "#{pkg}:trace_couch"
 
     module.exports = (doc) ->
       assert doc.reference?, 'The `reference` parameter is required'
@@ -51,18 +53,18 @@ We cannot use PouchDB's attachment methods because they would require to store t
           timeout: 60000
 
         req.on 'error', (error) ->
-          console.dir {error, when: ''}
+          debug "put packet.pcap: #{error}"
 
 Note: currently this will only unlink if the PUT was successful.
 FIXME: Retry the PUT once if it failed.
 
         req.on 'response', (res) ->
-          console.log "Done saving to #{uri}, ok=#{res.ok}, text=#{res.text}"
+          debug "Done saving to #{uri}, ok=#{res.ok}, text=#{res.text}"
           fs.unlinkAsync pcap
           .catch (error) ->
-            console.log "#{error} while unlinking #{pcap}"
+            debug "#{error} while unlinking #{pcap}"
 
-        console.log "Going to save #{pcap} to #{uri}"
+        debug "Going to save #{pcap} to #{uri}"
         stream.pipe req
-        console.log "Piping #{pcap} to #{uri}"
+        debug "Piping #{pcap} to #{uri}"
         null

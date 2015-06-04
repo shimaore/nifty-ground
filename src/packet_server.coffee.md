@@ -8,6 +8,8 @@
     byline = require 'byline'
     {EventEmitter} = require 'events'
     pcap_tail = require './pcap_tail'
+    pkg = require '../package.json'
+    debug = (require 'debug') "#{pkg}:packet_server"
 
     minutes = 60*1000 # milliseconds
 
@@ -97,9 +99,9 @@ it will trigger three event types:
 
       self.pipe = (s) ->
         if self._ended or self._closed
-          console.error 'pipe: self already ended or closed'
+          debug 'pipe: self already ended or closed'
         if self._pipe
-          console.error 'pipe: self already piped'
+          debug 'pipe: self already piped'
         self._pipe = s
         self.emit 'pipe', s
         return
@@ -125,11 +127,14 @@ This function tests whether a file is an acceptable input PCAP file name.
             return no unless options.find_since < file_time
           yes
 
+        debug "readdir #{trace_dir}"
+
         fs.readdirAsync trace_dir
         .then (files) ->
 
           Promise.all files.map (name) ->
             full_name = path.join trace_dir, name
+            debug "stat #{full_name}"
             fs.statAsync full_name
             .then (stats) ->
               if is_acceptable name, stats
@@ -158,24 +163,25 @@ We build a stash using the last 500 packets matching `ngrep_filter`.
 
 We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
 
+                  debug "parsing #{file.name}"
                   input = fs.createReadStream file.name
                   input = input.pipe zlib.createGunzip() if file.name.match /gz$/
                   pcap_tail.tail input, options.ngrep_filter, options.ngrep_limit ? 500, stash
 
                 .catch (error) ->
-                  console.error "#{error} while parsing #{file}"
+                  debug "#{error} while parsing #{file.name}"
                   stash
 
           it
 
         .then (stash) ->
-          console.log "Going to write #{stash.length} packets to #{fh}."
+          debug "Going to write #{stash.length} packets to #{fh}."
           pcap_tail.write fs.createWriteStream(fh), stash
           .then ->
             run_tshark()
 
         .catch (error) ->
-          console.error "server: #{error} while processing #{trace_dir}"
+          debug "#{error} while processing #{trace_dir}"
           null
 
         ## Select the proper packets
@@ -190,6 +196,7 @@ We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
 
         # stream is tshark.stdout
         tshark_pipe = (stream) ->
+          debug "tshark_pipe"
           linestream = byline stream
           linestream.on 'data', (line) ->
             data = tshark_line_parser line
@@ -198,28 +205,30 @@ We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
           linestream.on 'end', ->
             self.end()
           linestream.on 'error', ->
-            console.log "Linestream error"
+            debug "tshark_pipe: linestream error"
             seld.end()
 
         # Wait for the pcap_command to terminate.
 
         run_tshark = ->
-          console.log "Staring #{tshark_command}."
+          debug "spawn nice #{tshark_command}."
           tshark = spawn 'nice', tshark_command,
             stdio: ['ignore','pipe','ignore']
 
           tshark_kill = ->
+            debug "tshark_kill"
             tshark.kill()
 
           tshark_kill_timer = setTimeout tshark_kill, 10*minutes
 
           tshark.on 'exit', (code) ->
-            console.dir on:'exit', code:code, tshark_command:tshark_command
+            debug "On exit", code:code, tshark_command:tshark_command
             clearTimeout tshark_kill_timer
             # Remove the temporary (pcap) file, it's not needed anymore.
+            debug "unlink #{fh}"
             fs.unlinkAsync fh
             .catch (error) ->
-              console.dir {error, when: "unlink #{fh}"}
+              debug "unlink #{fh}: #{error}"
             # The response is complete
             self.close()
 
