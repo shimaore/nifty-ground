@@ -13,7 +13,7 @@ cat <<'CONF' >supervisord.conf
 nodaemon=true
 logfile=%(here)s/log/supervisord.log
 pidfile=%(here)s/log/supervisord.pid
-loglevel=debug
+loglevel=info
 
 [inet_http_server]
 port=127.0.0.1:2510
@@ -26,12 +26,16 @@ command=%(here)s/node_modules/.bin/coffee %(here)s/src/server.coffee.md
 priority=40
 autorestart=true
 redirect_stderr=true
+stdout_logfile=%(here)s/log/%(program_name)s.log
+stderr_logfile=%(here)s/log/%(program_name)s.log
 
 [program:periodic]
 command=%(here)s/node_modules/.bin/coffee %(here)s/src/periodic.coffee.md
 priority=60
 autorestart=true
 redirect_stderr=true
+stdout_logfile=%(here)s/log/%(program_name)s.log
+stderr_logfile=%(here)s/log/%(program_name)s.log
 
 CONF
 
@@ -42,6 +46,8 @@ command=/usr/bin/dumpcap -p -q -i ${intf} -b filesize:${filesize} -b files:${rin
 priority=20
 autorestart=true
 redirect_stderr=true
+stdout_logfile=%(here)s/log/%(program_name)s.log
+stderr_logfile=%(here)s/log/%(program_name)s.log
 
 CONF
 done
