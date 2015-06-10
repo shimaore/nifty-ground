@@ -51,6 +51,9 @@ Wait for a trace request.
         .catch (error) ->
           client.emit 'trace_error', host:hostname, in_reply_to:doc, error:error.toString()
 
+      client.on 'ping', (doc) ->
+        client.emit 'pong', host:hostname, in_reply_to:doc, name:pkg.name, version:pkg.version
+
       console.log "#{pkg.name} #{pkg.version} ready on #{hostname}"
 
     do main
