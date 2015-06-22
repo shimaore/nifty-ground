@@ -37,6 +37,14 @@ redirect_stderr=true
 stdout_logfile=%(here)s/log/%(program_name)s.log
 stderr_logfile=%(here)s/log/%(program_name)s.log
 
+[program:munin]
+command=%(here)s/node_modules/.bin/coffee %(here)s/src/munin.coffee.md
+priority=60
+autorestart=true
+redirect_stderr=true
+stdout_logfile=%(here)s/log/%(program_name)s.log
+stderr_logfile=%(here)s/log/%(program_name)s.log
+
 CONF
 
 for intf in ${INTERFACES}; do
