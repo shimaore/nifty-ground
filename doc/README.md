@@ -1,3 +1,27 @@
+Actual Munin-node plugin
+========================
+
+For example `/etc/munin/plugins/dumpcap_reasons`:
+
+    #!/bin/bash
+    curl -s ${URL:-http://127.0.0.1:3939}/$1
+    echo
+
+Set `env.URL` in the plugins' configuration if using a port (or host) different from the defaults:
+
+    [dumpcap_reasons]
+    env.URL http://127.0.0.1:4242
+
+Testing with munin-node once installed
+======================================
+
+You need to announce the `multigraph` capability in order for 'munin-node' to report the graph.
+
+    echo -n -e 'cap multigraph\nlist\nfetch dumpcap_reasons\nquit\n' | nc localhost 4949
+
+example.pcap
+============
+
 The `example.pcap` file was generated using
 
     echo -n -e 'Hello' | nc -u 10.1.1.1 5060
