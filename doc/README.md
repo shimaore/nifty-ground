@@ -5,7 +5,6 @@ For example `/etc/munin/plugins/dumpcap_reasons`:
 
     #!/bin/bash
     curl -s ${URL:-http://127.0.0.1:3939}/$1
-    echo
 
 Set `env.URL` in the plugins' configuration if using a port (or host) different from the defaults:
 
