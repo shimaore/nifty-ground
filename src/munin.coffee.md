@@ -4,7 +4,7 @@ Web Services for Munin
     run = (cfg) -> Zappa cfg.web, ->
 
       @get '/autoconf', ->
-        @send 'yes'
+        @send 'yes\n'
         return
 
       @get '/config', ->

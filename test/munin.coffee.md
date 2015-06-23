@@ -17,7 +17,7 @@
         .get 'http://127.0.0.1:3939/autoconf'
         .then (res) ->
           assert res.ok
-          assert res.text is 'yes'
+          assert res.text is 'yes\n'
 
       it 'should conf', ->
         req
