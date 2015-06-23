@@ -28,15 +28,12 @@ Web Services for Munin
               parser.on 'packet', ({header:{timestampSeconds},data}) ->
                 time = new Date timestampSeconds*1000
                 content = data.toString 'ascii'
-                debug "Received packet, #{since} < #{time} < #{now}"
                 return unless since < time < now
-                debug "Matching #{content}"
 
 FIXME: This is highly unsatisfactory as it will also match (as the data example shows) ICMP response packets.
 
                 m = content.match /SIP\/2.0 ([2-6]\d\d) [^]*CSeq: \d+ INVITE/i
                 return unless m
-                debug "Matched", m
                 count[m[1]] ?= 0
                 count[m[1]]++
                 total++
