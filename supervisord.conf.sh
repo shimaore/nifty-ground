@@ -22,7 +22,7 @@ port=127.0.0.1:2510
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 
 [program:server]
-command=%(here)s/node_modules/.bin/coffee %(here)s/src/server.coffee.md
+command=/usr/bin/nice %(here)s/node_modules/.bin/coffee %(here)s/src/server.coffee.md
 priority=40
 autorestart=true
 redirect_stderr=true
@@ -30,7 +30,7 @@ stdout_logfile=%(here)s/log/%(program_name)s.log
 stderr_logfile=%(here)s/log/%(program_name)s.log
 
 [program:periodic]
-command=%(here)s/node_modules/.bin/coffee %(here)s/src/periodic.coffee.md
+command=/usr/bin/nice %(here)s/node_modules/.bin/coffee %(here)s/src/periodic.coffee.md
 priority=60
 autorestart=true
 redirect_stderr=true
@@ -38,7 +38,7 @@ stdout_logfile=%(here)s/log/%(program_name)s.log
 stderr_logfile=%(here)s/log/%(program_name)s.log
 
 [program:munin]
-command=%(here)s/node_modules/.bin/coffee %(here)s/src/munin.coffee.md
+command=/usr/bin/nice %(here)s/node_modules/.bin/coffee %(here)s/src/munin.coffee.md
 priority=60
 autorestart=true
 redirect_stderr=true
