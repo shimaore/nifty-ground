@@ -1,4 +1,4 @@
-FROM shimaore/nodejs
+FROM shimaore/nodejs:1.1.0
 MAINTAINER Stéphane Alnet <stephane@shimaore.net>
 
 # Required to be able to go through the installation of wireshark-common.
@@ -9,7 +9,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
   gzip \
   procps \
   supervisor \
-  'tshark=1.12.5+g5819e5b-1'
+  'tshark=1.12.6+gee1fce6-1'
 
 # Dumpcap can be installed in a way that allows members of the "wireshark" system
 # group to capture packets. This is recommended over the alternative of running
