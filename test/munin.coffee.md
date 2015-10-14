@@ -90,7 +90,7 @@
           web:
             host: '127.0.0.1'
             port: 3939
-            timespan: 100*366*86400
+            timespan: 1000*366*86400
 
       after ->
         app.server.close()
