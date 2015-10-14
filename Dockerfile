@@ -1,5 +1,24 @@
-FROM shimaore/nodejs:1.1.0
+FROM shimaore/debian:2.0.3
 MAINTAINER Stéphane Alnet <stephane@shimaore.net>
+
+# Install Node.js using `n`.
+RUN \
+  apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    git \
+    make \
+  && git clone https://github.com/tj/n.git \
+  && cd n \
+  && make install \
+  && cd .. \
+  && apt-get purge -y \
+    make \
+  && apt-get autoremove -y \
+  && apt-get clean \
+  && n 4.2.1
+
+ENV NODE_ENV production
 
 # Required to be able to go through the installation of wireshark-common.
 ENV DEBIAN_FRONTEND noninteractive
