@@ -27,6 +27,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
   build-essential \
   gzip \
   procps \
+  python-pkg-resources \
   supervisor \
   'tshark=2.0.0+g9a73b82-1'
 
