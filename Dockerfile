@@ -1,4 +1,4 @@
-FROM shimaore/debian:2.0.3
+FROM shimaore/debian:2.0.4
 MAINTAINER Stéphane Alnet <stephane@shimaore.net>
 
 # Install Node.js using `n`.
