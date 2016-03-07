@@ -4,7 +4,7 @@
 # The package name (in package.json) MUST be `docker.<name>`, which is
 # substituted (since `npm` doesn't allow slashes in names).
 #
-NAME=shimaore/`jq -r .name package.json`
+NAME=`jq -r .docker_name package.json`
 TAG=`jq -r .version package.json`
 
 image:
