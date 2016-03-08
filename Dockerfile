@@ -29,7 +29,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
   procps \
   python-pkg-resources \
   supervisor \
-  'tshark=2.0.0+g9a73b82-1'
+  'tshark=2.0.2+ga16e22e-1'
 
 # Dumpcap can be installed in a way that allows members of the "wireshark" system
 # group to capture packets. This is recommended over the alternative of running
