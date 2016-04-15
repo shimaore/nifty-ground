@@ -50,11 +50,13 @@ Wait for a trace request.
           client.emit 'trace_completed',
             host:hostname
             in_reply_to:doc
+            _in: "trace:#{doc.reference}"
         .catch (error) ->
           client.emit 'trace_error',
             host:hostname
             in_reply_to:doc
             error:error.toString()
+            _in: "trace:#{doc.reference}"
 
       client.on 'ping', (doc) ->
         client.emit 'pong',
