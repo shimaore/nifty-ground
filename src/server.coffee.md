@@ -47,12 +47,21 @@ Wait for a trace request.
         .then ->
           trace_couch doc
         .then ->
-          client.emit 'trace_completed', host:hostname, in_reply_to:doc
+          client.emit 'trace_completed',
+            host:hostname
+            in_reply_to:doc
         .catch (error) ->
-          client.emit 'trace_error', host:hostname, in_reply_to:doc, error:error.toString()
+          client.emit 'trace_error',
+            host:hostname
+            in_reply_to:doc
+            error:error.toString()
 
       client.on 'ping', (doc) ->
-        client.emit 'pong', host:hostname, in_reply_to:doc, name:pkg.name, version:pkg.version
+        client.emit 'pong',
+          host:hostname
+          in_reply_to:doc
+          name:pkg.name
+          version:pkg.version
 
       console.log "#{pkg.name} #{pkg.version} ready on #{hostname}"
 
