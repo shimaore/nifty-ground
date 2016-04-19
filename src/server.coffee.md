@@ -41,7 +41,10 @@ Configure (see the [spicy-action service](https://github.com/shimaore/spicy-acti
 Wait for a trace request.
 
       client.on 'trace', (doc) ->
-        client.emit 'trace_started', host:hostname, in_reply_to:doc
+        client.emit 'trace_started',
+          host:hostname
+          in_reply_to:doc
+          _in: "trace:#{doc.reference}"
         debug "received trace request #{JSON.stringify doc}"
         Promise.resolve()
         .then ->
