@@ -22,9 +22,7 @@ ENV NODE_ENV production
 
 # Required to be able to go through the installation of wireshark-common.
 ENV DEBIAN_FRONTEND noninteractive
-# `build-essential` is currently required because pouchdb depends on leveldown which must be compiled.
 RUN apt-get update && apt-get -y --no-install-recommends install \
-  build-essential \
   gzip \
   procps \
   supervisor \
