@@ -11,24 +11,24 @@
   ],
   "author": "Stephane Alnet <stephane@shimaore.net>",
   "dependencies": {
-    "bluebird": "^3.3.4",
+    "bluebird": "^3.3.5",
     "byline": "^4.2.1",
     "debug": "^2.2.0",
     "pcap-parser": "0.2.1",
-    "pouchdb": "^5.3.0",
-    "request": "^2.69.0",
-    "socket.io-client": "^1.4.5",
+    "pouchdb": "^5.3.2",
+    "request": "^2.72.0",
+    "socket.io-client": "^1.4.6",
     "stream-buffers": "^3.0.0",
-    "zappajs": "^4.0.2"
+    "zappajs": "^4.1.2"
   },
   "private": true,
   "devDependencies": {
     "chai": "^3.5.0",
-    "chai-as-promised": "^5.2.0",
+    "chai-as-promised": "^5.3.0",
     "coffee-script": "^1.10.0",
     "mocha": "^2.4.5",
-    "superagent": "^1.7.2",
-    "superagent-as-promised": "^3.2.1"
+    "superagent": "^1.8.3",
+    "superagent-as-promised": "^4.0.0"
   },
   "scripts": {
     "pretest": "npm install",

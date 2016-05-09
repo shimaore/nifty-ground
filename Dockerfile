@@ -1,4 +1,4 @@
-FROM shimaore/debian:2.0.6
+FROM shimaore/debian:2.0.8
 MAINTAINER Stéphane Alnet <stephane@shimaore.net>
 
 # Install Node.js using `n`.
@@ -16,7 +16,7 @@ RUN \
     make \
   && apt-get autoremove -y \
   && apt-get clean \
-  && n 4.3.2
+  && n 4.4.4
 
 ENV NODE_ENV production
 
