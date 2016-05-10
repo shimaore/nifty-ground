@@ -8,8 +8,11 @@ Cleanup the trace directory every hour
     hourly = 60*60*1000
 
     setInterval ->
+
+FIXME should try to retrieve `new_interfaces`
+
       try
-        cleanup
+        cleanup()
       catch error
         debug "Cleanup: #{error}"
     , hourly
