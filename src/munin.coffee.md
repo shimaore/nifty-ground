@@ -22,9 +22,12 @@ Web Services for Munin
         .map (name)  ->
           new Promise (resolve,reject) ->
             try
-              return unless name.match /^(eth[^_]+)_\d+_(\d+).pcap(.gz)?$/
-              debug "Going to parse #{name} in #{trace_dir}"
-              parser = parse path.join trace_dir, name
+              return unless m = name.match /^eth[^_]+_\d+_\d+.pcap(.gz)?$/
+              full_name = path.join trace_dir, name
+              debug "Going to parse", full_name
+              input = fs.createReadStream full_name
+              input = input.pipe zlib.createGunzip() if m[1]?
+              parser = parse input
               parser.on 'packet', ({header:{timestampSeconds},data}) ->
                 time = new Date timestampSeconds*1000
                 content = data.toString 'ascii'
