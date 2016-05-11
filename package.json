@@ -19,7 +19,7 @@
     "request": "^2.72.0",
     "socket.io-client": "^1.4.6",
     "stream-buffers": "^3.0.0",
-    "zappajs": "^4.1.2"
+    "zappajs": "^4.1.4"
   },
   "private": true,
   "devDependencies": {

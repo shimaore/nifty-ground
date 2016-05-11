@@ -82,19 +82,34 @@
         5QoBAQHOJRPEADcNSlNJUC8yLjAgNjA0IEV4Y3VzZSBtZQpDU2VxOiA3MjgxNzI4MTcyNiBJTlZJ
         VEUK
         ''', 'base64'
+        pcap_gz = new Buffer '''
+        H4sICHUEM1cAA2Zvby5wY2FwALtyeNNCJgYWBgRgYWAEknaP20MLjJgZQoFsEJ7wLcjt1LWEnDT9
+        rhMcDK4MDO7BJx0YHARF/Q6sYH3KxcjIuPmx8BEGY/PwYM8AfSM9AwUTA3OF0LzE0pKM/KLMqtQU
+        Lufg1EIrBWNDIzMFT78wzxBXLpAlkebMDIVAC0AYYjzEKqAlBxiSp15lYLBnFC4DWQCyiJn53AWQ
+        I2EOsBcUo8QBXkAHPFPkYAgAGhmAzZdO4VwgXwoJwSzZehhoiR77Q4QlFgohmbmp+aUlCPMVkM0X
+        UOdgyAGanYPNg3EzloE8KLAKyYOnoR4E220vKEym3YFAu2/mceLxW2w5yG/cS2Hm31ADmf8sE7f5
+        hkbGxsjmH+vmxOO32Wogv/FpYfMbyG57QR4y7Y4F2l0Vw8OgDzRNH5vfFJO2gfzG1g4zvyceaD5v
+        lr9Hak5OPkg7XyIPgzdQqzc2p9suWA5yOscpJKevgjodbLS9IDt2o0uBRs9L52CIBCqOxOYy7xRX
+        kMtYzsG0n1MFajfn9YL53MzARMG1Irm0OFUhNxXqd3MjC0MIhiddkEW3czgYSoGWlGLzQ/qqVJAf
+        /j1E8sMVqB/AjrAXZKXUEQDIRiq9PgQAAA==
+        ''', 'base64'
         fs.mkdirAsync 'pcap'
         .then ->
           fs.writeFileAsync 'pcap/eth1_00832_20150101120000.pcap', pcap
-
-        app = munin
-          web:
-            host: '127.0.0.1'
-            port: 3939
-            timespan: 1000*366*86400
+        .then ->
+          fs.writeFileAsync 'pcap/eth1_00833_20150101120010.pcap.gz', pcap_gz
+        .then ->
+          app = munin
+            web:
+              host: '127.0.0.1'
+              port: 3939
+              timespan: 1000*366*86400
 
       after ->
         app.server.close()
         fs.unlinkAsync 'pcap/eth1_00832_20150101120000.pcap'
+        .then ->
+          fs.unlinkAsync 'pcap/eth1_00833_20150101120010.pcap.gz'
         .then ->
           fs.rmdirAsync 'pcap'
 
@@ -103,7 +118,7 @@
         .get 'http://127.0.0.1:3939/'
         .then (res) ->
           assert res.ok
-          assert res.text.match /^multigraph dumpcap_reasons_abs\ndumpcap_reasons_abs_200.value 0[^]*dumpcap_reasons_abs_407.value 2\n/
+          assert res.text.match /^multigraph dumpcap_reasons_abs\ndumpcap_reasons_abs_200.value 0[^]*dumpcap_reasons_abs_407.value 4\n/
 
     assert = require 'assert'
     Promise = require 'bluebird'

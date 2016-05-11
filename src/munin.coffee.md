@@ -191,6 +191,7 @@ Toolbox
     path = require 'path'
     pkg = require '../package.json'
     debug = (require 'debug') "#{pkg.name}:munin"
+    zlib = require 'zlib'
 
     trace_dir = path.join process.cwd(), 'pcap'
 
