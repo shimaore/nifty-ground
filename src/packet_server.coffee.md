@@ -18,7 +18,7 @@ An additional field "intf" indicates on which interface
 the packet was captured.
 
     trace_field_names = [
-      "frame.time"
+      "_ws.col.Time"
       "ip.version"
       "ip.dsfield.dscp"
       "ip.src"
@@ -189,13 +189,12 @@ We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
           null
 
         ## Select the proper packets
+        tshark_command = [
+          'tshark', '-r', fh, '-Y', options.tshark_filter, '-nltud', '-o', 'gui.column.format:Time,%Yut', '-T', 'fields', tshark_fields...
+        ]
         if options.pcap?
           tshark_command = [
-            'tshark', '-r', fh, '-Y', options.tshark_filter, '-nltad', '-T', 'fields', tshark_fields..., '-P', '-w', options.pcap
-          ]
-        else
-          tshark_command = [
-            'tshark', '-r', fh, '-Y', options.tshark_filter, '-nltad', '-T', 'fields', tshark_fields...
+            tshark_command..., '-P', '-w', options.pcap
           ]
 
         # stream is tshark.stdout
