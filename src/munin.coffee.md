@@ -29,9 +29,11 @@ Web Services for Munin
               input = input.pipe zlib.createGunzip() if m[1]?
               parser = parse input
               parser.on 'packet', ({header:{timestampSeconds},data}) ->
+
                 time = new Date timestampSeconds*1000
-                content = data.toString 'ascii'
                 return unless since < time < now
+
+                content = data.toString 'ascii'
 
 FIXME: This is highly unsatisfactory as it will also match (as the data example shows) ICMP response packets.
 
@@ -41,6 +43,7 @@ FIXME: This is highly unsatisfactory as it will also match (as the data example 
                 count[m[1]]++
                 total++
               parser.on 'end', ->
+                debug "Retained #{total} packets", full_name
                 resolve()
 
             catch error
