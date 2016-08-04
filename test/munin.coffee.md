@@ -103,7 +103,7 @@
             web:
               host: '127.0.0.1'
               port: 3941
-              timespan: 1000*366*86400
+              timespan: new Date() - new Date '2015-01-01'
 
       after ->
         app.server.close()
