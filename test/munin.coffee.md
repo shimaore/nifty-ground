@@ -42,7 +42,7 @@
         app = munin
           web:
             host: '127.0.0.1'
-            port: 3939
+            port: 3940
 
       after ->
         app.server.close()
@@ -50,7 +50,7 @@
 
       it 'should handle empty dir', ->
         req
-        .get 'http://127.0.0.1:3939/'
+        .get 'http://127.0.0.1:3940/'
         .then (res) ->
           assert res.ok
           assert res.text.match /^multigraph dumpcap_reasons_abs\ndumpcap_reasons_abs_200.value 0/
@@ -102,7 +102,7 @@
           app = munin
             web:
               host: '127.0.0.1'
-              port: 3939
+              port: 3941
               timespan: 1000*366*86400
 
       after ->
@@ -115,7 +115,7 @@
 
       it 'should read pcap file', ->
         req
-        .get 'http://127.0.0.1:3939/'
+        .get 'http://127.0.0.1:3941/'
         .then (res) ->
           assert res.ok
           assert res.text.match /^multigraph dumpcap_reasons_abs\ndumpcap_reasons_abs_200.value 0[^]*dumpcap_reasons_abs_407.value 4\n/
