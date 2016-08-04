@@ -1,4 +1,4 @@
-FROM shimaore/debian:2.0.8
+FROM shimaore/debian:2.0.10
 MAINTAINER Stéphane Alnet <stephane@shimaore.net>
 
 # Install Node.js using `n`.
@@ -16,7 +16,7 @@ RUN \
     make \
   && apt-get autoremove -y \
   && apt-get clean \
-  && n 4.4.4
+  && n 6.3.1
 
 ENV NODE_ENV production
 
@@ -26,7 +26,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install \
   gzip \
   procps \
   supervisor \
-  'tshark=2.0.3+geed34f0-1'
+  'tshark=2.0.4+gdd7746e-1'
 
 # Dumpcap can be installed in a way that allows members of the "wireshark" system
 # group to capture packets. This is recommended over the alternative of running
