@@ -154,8 +154,9 @@ Munin Configuration
     config_rel = """
       multigraph #{name}
       graph_title Reasons codes (%)
-      graph_args -l 0
-      graph_vlabel reason codes (%)
+      graph_args --upper-limit 100 -l 0
+      graph_scale no
+      graph_vlabel %
       graph_category voice
 
     """
