@@ -39,6 +39,7 @@ the request a second time.
         doc.packets = packets
         dest.put doc
       .then (b) ->
+        dest.close() # async
 
 We cannot use PouchDB's attachment methods because they would require to store the object in memory in a Buffer.
 
