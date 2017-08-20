@@ -9,7 +9,8 @@ the request a second time.
 
     assert = require 'assert'
     request = require 'request'
-    PouchDB = require 'pouchdb'
+    PouchDB = require 'pouchdb-core'
+      .plugin require 'pouchdb-adapter-http'
 
     json_gather = require './json_gather'
     trace = require './trace'

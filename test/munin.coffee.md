@@ -1,4 +1,4 @@
-    req = (require 'superagent-as-promised') require 'superagent'
+    req = require 'superagent'
     describe 'Munin', ->
       munin = require '../src/munin'
 
