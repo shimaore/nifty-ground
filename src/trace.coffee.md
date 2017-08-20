@@ -21,7 +21,7 @@ The server filters and formats the trace.
 
 Stubbornly refuse to print out all packets.
 
-      unless doc.to_user? or doc.from_user? or doc.call_id? or doc.ip?
+      unless doc.use_xref or doc.to_user? or doc.from_user? or doc.call_id? or doc.ip?
         throw new TraceError 'Either one of `to_user`, `from_user`, `call_id`, or `ip` is a required parameter.'
 
 # Generate a merged capture file
@@ -29,6 +29,7 @@ Stubbornly refuse to print out all packets.
 ngrep is used to pre-filter packets
 
       ngrep_filter = []
+      ngrep_filter.push "xref=#{doc.reference}" if doc.use_xref
       ngrep_filter.push '([Tt][Oo]|t)'+     ':[^\r\n]*' + doc.to_user   if doc.to_user?
       ngrep_filter.push '([Ff][Rr][Oo][Mm]|f)'+   ':[^\r\n]*' + doc.from_user if doc.from_user?
       ngrep_filter.push '([Cc][Aa][Ll][Ll]-[Ii][Dd]|i)'+':[^\r\n]*' + doc.call_id   if doc.call_id?
