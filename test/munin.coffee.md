@@ -4,6 +4,8 @@
 
       app = null
       before ->
+        fs.rmdirAsync 'pcap'
+          .catch -> yes
         app = munin
           web:
             host: '127.0.0.1'
@@ -31,7 +33,7 @@
         .get 'http://127.0.0.1:3939/'
         .then (res) ->
           assert res.ok
-          assert res.text is ''
+          assert.strictEqual res.text, ''
 
     describe 'Munin with dir', ->
       munin = require '../src/munin'
@@ -39,6 +41,7 @@
 
       before ->
         fs.mkdirAsync 'pcap'
+          .catch -> yes
         app = munin
           web:
             host: '127.0.0.1'
@@ -94,6 +97,7 @@
         /j1E8sMVqB/AjrAXZKXUEQDIRiq9PgQAAA==
         ''', 'base64'
         fs.mkdirAsync 'pcap'
+          .catch -> yes
         .then ->
           fs.writeFileAsync 'pcap/eth1_00832_20150101120000.pcap', pcap
         .then ->

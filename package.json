@@ -31,7 +31,7 @@
     "superagent": "^3.6.0"
   },
   "scripts": {
-    "pretest": "npm install",
+    "pretest": "npm install --only=dev",
     "test": "mocha"
   },
   "repository": {

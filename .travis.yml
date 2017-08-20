@@ -9,3 +9,15 @@ services:
 
 before_install:
 - docker pull debian:testing-slim
+
+script:
+- docker build -t "shimaore/nifty-ground:latest" .
+- docker run -t -i --rm "shimaore/nifty-ground:latest" npm test
+
+after_success:
+- docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
+- test "${TRAVIS_BRANCH}" = master && docker push "shimaore/nifty-ground:latest"
+- test -n "${TRAVIS_BRANCH}" && docker tag  "shimaore/nifty-ground:latest" "shimaore/nifty-ground:${TRAVIS_BRANCH}"
+- test -n "${TRAVIS_BRANCH}" && docker push "shimaore/nifty-ground:${TRAVIS_BRANCH}"
+- test -n "${TRAVIS_TAG}" && docker tag  "shimaore/nifty-ground:latest" "shimaore/nifty-ground:${TRAVIS_TAG}"
+- test -n "${TRAVIS_TAG}" && docker push "shimaore/nifty-ground:${TRAVIS_TAG}"

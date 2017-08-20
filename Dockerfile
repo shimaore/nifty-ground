@@ -44,6 +44,6 @@ USER nifty-ground
 RUN mkdir -p log pcap
 RUN npm install \
   && npm install coffee-script \
-  && npm cache clean
+  && npm cache -f clean
 
 CMD ["/opt/nifty-ground/supervisord.conf.sh"]
