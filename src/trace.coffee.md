@@ -21,7 +21,7 @@ The server filters and formats the trace.
 
 Stubbornly refuse to print out all packets.
 
-      unless doc.use_xref or doc.to_user? or doc.from_user? or doc.call_id? or doc.ip?
+      unless doc.use_xref or doc.to_user? or doc.from_user? or doc.call_id? or doc.ip? or doc.port? or doc.ports?
         throw new TraceError 'Either one of `to_user`, `from_user`, `call_id`, or `ip` is a required parameter.'
 
 # Generate a merged capture file
@@ -63,6 +63,16 @@ Wireshark's format: Nov 12, 1999 08:55:44.123
           tshark_filter.push """
             (ipv6.addr == #{doc.ip})
           """
+
+      if doc.port?
+        tshark_filter.push """
+          (tcp.port == #{doc.port} or udp.port == #{doc.port})
+        """
+      if doc.ports?
+        ports = doc.ports.join ' '
+        tshark_filter.push """
+          (tcp.port in { #{ports} } or udp.port in { #{ports} })
+        """
 
       if tshark_filter.length > 0
         tshark_filter = tshark_filter.join ' && '
