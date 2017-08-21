@@ -13,6 +13,10 @@
 
     minutes = 60*1000 # milliseconds
 
+FIXME Generalize: this is copied from (but really, should be exported by) `huge-play/middleware/*/setup.coffee.md`.
+
+    XRef = /xref[=:]([\w-]+)/
+
 # Fields returned in the "JSON" response.
 An additional field "intf" indicates on which interface
 the packet was captured.
@@ -31,6 +35,7 @@ the packet was captured.
       "sip.Call-ID"
       "sip.Request-Line"
       "sip.Method"
+      "sip.r-uri"
       "sip.r-uri.user"
       "sip.r-uri.host"
       "sip.r-uri.port"
@@ -39,8 +44,11 @@ the packet was captured.
       "sip.to.user"
       "sip.from.user"
       "sip.From"
+      "sip.from.param"
       "sip.To"
+      "sip.to.param"
       "sip.contact.uri"
+      "sip.contact.param"
       "sip.User-Agent"
     ]
 
@@ -204,6 +212,19 @@ We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
           linestream.on 'data', (line) ->
             data = tshark_line_parser line
             data.intf = intf
+
+Locate xref
+
+            switch
+              when m = data['sip.r-uri']?.match XRef
+                data.xref = m[1]
+              when m = data['sip.from.param']?.match XRef
+                data.xref = m[1]
+              when m = data['sip.to.param']?.match XRef
+                data.xref = m[1]
+              when m = data['sip.contact.param']?.match XRef
+                data.xref = m[1]
+
             self.emit 'data', data
           linestream.on 'end', ->
             self.end()
