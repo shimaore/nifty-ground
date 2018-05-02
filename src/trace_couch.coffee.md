@@ -9,15 +9,14 @@ the request a second time.
 
     assert = require 'assert'
     request = require 'request'
-    PouchDB = require 'pouchdb-core'
-      .plugin require 'pouchdb-adapter-http'
+    PouchDB = require 'ccnq4-pouchdb'
 
     json_gather = require './json_gather'
     trace = require './trace'
     qs = require 'querystring'
     url = require 'url'
-    Promise = require 'bluebird'
-    fs = Promise.promisifyAll require 'fs'
+    {promisifyAll} = require 'bluebird'
+    fs = promisifyAll require 'fs'
     pkg = require '../package.json'
     debug = (require 'debug') "#{pkg}:trace_couch"
 
@@ -35,39 +34,36 @@ the request a second time.
       doc.host = process.env.HOSTNAME
       doc._id = [doc.type, doc.reference, doc.host].join ':'
 
-      json_gather self
-      .then (packets) ->
-        doc.packets = packets
-        dest.put doc
-      .then (b) ->
-        dest.close() # async
+      packets = await json_gather self
+      doc.packets = packets
+      b = await dest.put doc
 
 We cannot use PouchDB's attachment methods because they would require to store the object in memory in a Buffer.
 
-        stream = fs.createReadStream pcap
-        req = request.put
-          baseUrl: uri
-          uri: "#{qs.escape doc._id}/packets.pcap"
-          qs:
-            rev: b.rev
-          headers:
-            'Content-Type': 'application/vnd.tcpdump.pcap'
-            'Accept': 'json'
-          timeout: 60000
+      stream = fs.createReadStream pcap
+      req = request.put
+        baseUrl: uri
+        uri: "#{qs.escape doc._id}/packets.pcap"
+        qs:
+          rev: b.rev
+        headers:
+          'Content-Type': 'application/vnd.tcpdump.pcap'
+          'Accept': 'json'
+        timeout: 60000
 
-        req.on 'error', (error) ->
-          debug "put packet.pcap: #{error}"
+      req.on 'error', (error) ->
+        debug "put packet.pcap: #{error}"
 
 Note: currently this will only unlink if the PUT was successful.
 FIXME: Retry the PUT once if it failed.
 
-        req.on 'response', (res) ->
-          debug "Done saving to #{uri}, ok=#{res.ok}, text=#{res.text}"
-          fs.unlinkAsync pcap
-          .catch (error) ->
-            debug "#{error} while unlinking #{pcap}"
+      req.on 'response', (res) ->
+        debug "Done saving to #{uri}, ok=#{res.ok}, text=#{res.text}"
+        fs.unlinkAsync pcap
+        .catch (error) ->
+          debug "#{error} while unlinking #{pcap}"
 
-        debug "Going to save #{pcap} to #{uri}"
-        stream.pipe req
-        debug "Piping #{pcap} to #{uri}"
-        null
+      debug "Going to save #{pcap} to #{uri}"
+      stream.pipe req
+      debug "Piping #{pcap} to #{uri}"
+      null

@@ -1,8 +1,8 @@
 (c) 2012-2015 Stephane Alnet
 
     {spawn} = require('child_process')
-    Promise = require 'bluebird'
-    fs = Promise.promisifyAll require 'fs'
+    {promisifyAll} = require 'bluebird'
+    fs = promisifyAll require 'fs'
     path = require 'path'
     zlib = require 'zlib'
     byline = require 'byline'

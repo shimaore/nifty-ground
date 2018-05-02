@@ -1,5 +1,5 @@
-    Promise = require 'bluebird'
-    fs = Promise.promisifyAll require 'fs'
+    {promisifyAll} = require 'bluebird'
+    fs = promisifyAll require 'fs'
     path = require 'path'
     spawn = require('child_process').spawn
     pkg = require '../package.json'

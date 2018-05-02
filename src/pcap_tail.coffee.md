@@ -3,7 +3,6 @@ Provides two methods on a 'stash' (Array) of packet descriptions:
     GLOBAL_HEADER_LENGTH = 24
     PACKET_HEADER_LENGTH = 16
 
-    Promise = require 'bluebird'
     pcapp = require 'pcap-parser'
 
     module.exports =

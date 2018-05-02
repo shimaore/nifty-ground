@@ -125,5 +125,5 @@
           assert res.text.match /^multigraph dumpcap_reasons_abs\ndumpcap_reasons_abs_200.value 0[^]*dumpcap_reasons_abs_407.value 4\n/
 
     assert = require 'assert'
-    Promise = require 'bluebird'
-    fs = Promise.promisifyAll require 'fs'
+    {promisifyAll} = require 'bluebird'
+    fs = promisifyAll require 'fs'

@@ -1,7 +1,5 @@
 (c) 2012-2015 Stephane Alnet
 
-    Promise = require 'bluebird'
-
     module.exports = (self) ->
 
 Aggregate the contents received via `data` events into an Array.

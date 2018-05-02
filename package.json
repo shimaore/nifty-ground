@@ -11,16 +11,16 @@
   ],
   "author": "Stephane Alnet <stephane@shimaore.net>",
   "dependencies": {
-    "bluebird": "^3.5.0",
-    "byline": "^5.0.0",
-    "debug": "^3.0.0",
+    "bluebird": "^3.5.1",
+    "ccnq4-pouchdb": "^1.0.0",
     "pcap-parser": "0.2.1",
-    "pouchdb-adapter-http": "^6.3.4",
-    "pouchdb-core": "^6.3.4",
-    "request": "^2.81.0",
-    "socket.io-client": "^2.0.3",
+    "red-rings": "^1.1.4",
+    "red-rings-axon": "^2.0.0",
+    "request": "^2.85.0",
+    "socket.io-client": "^2.1.0",
     "stream-buffers": "^3.0.1",
-    "zappajs": "^6.4.1"
+    "tangible": "^2.0.0",
+    "zappajs": "^6.5.0"
   },
   "private": true,
   "devDependencies": {
