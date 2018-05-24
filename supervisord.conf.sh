@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 chown -R nifty-ground /data
 
