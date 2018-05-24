@@ -13,8 +13,7 @@ filter="${FILTER:-${default_filter}}"
 cat <<'CONF' >supervisord.conf
 [supervisord]
 nodaemon=true
-logfile=%(here)s/log/supervisord.log
-pidfile=%(here)s/log/supervisord.pid
+logfile=/data/supervisord.log
 loglevel=info
 
 [inet_http_server]
@@ -24,28 +23,25 @@ port=127.0.0.1:2510
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 
 [program:server]
-command=/usr/bin/nice %(here)s/node_modules/.bin/coffee %(here)s/src/server.coffee.md
+command=/usr/bin/nice node %(here)s/src/server.js
 priority=40
 autorestart=true
-redirect_stderr=true
-stdout_logfile=%(here)s/log/%(program_name)s.log
-stderr_logfile=%(here)s/log/%(program_name)s.log
+stdout_logfile=/data/server.log
+stderr_logfile=/data/server.error
 
 [program:periodic]
-command=/usr/bin/nice %(here)s/node_modules/.bin/coffee %(here)s/src/periodic.coffee.md
+command=/usr/bin/nice node %(here)s/src/periodic.js
 priority=60
 autorestart=true
-redirect_stderr=true
-stdout_logfile=%(here)s/log/%(program_name)s.log
-stderr_logfile=%(here)s/log/%(program_name)s.log
+stdout_logfile=/data/periodic.log
+stderr_logfile=/data/periodic.error
 
 [program:munin]
-command=/usr/bin/nice %(here)s/node_modules/.bin/coffee %(here)s/src/munin.coffee.md
+command=/usr/bin/nice node %(here)s/src/munin.js
 priority=60
 autorestart=true
-redirect_stderr=true
-stdout_logfile=%(here)s/log/%(program_name)s.log
-stderr_logfile=%(here)s/log/%(program_name)s.log
+stdout_logfile=/data/munin.log
+stderr_logfile=/data/munin.error
 
 CONF
 
@@ -55,9 +51,8 @@ for intf in ${INTERFACES}; do
 command=/usr/bin/dumpcap -p -q -i ${intf} -b filesize:${filesize} -b files:${ringsize} -P -w /data/${intf}.pcap -f '${filter}' -s 65535
 priority=20
 autorestart=true
-redirect_stderr=true
-stdout_logfile=%(here)s/log/%(program_name)s.log
-stderr_logfile=%(here)s/log/%(program_name)s.log
+stdout_logfile=/data/${intf}.log
+stderr_logfile=/data/${intf}.error
 
 CONF
 done
