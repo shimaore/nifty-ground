@@ -1,5 +1,7 @@
 #!/bin/bash
 
+chown -R nifty-ground /data
+
 default_filesize=10000
 default_ringsize=50
 default_filter='udp portrange 5060-5299 or udp portrange 15060-15299 or icmp or tcp portrange 5060-5299 or tcp portrange 15060-15299'
@@ -50,7 +52,7 @@ CONF
 for intf in ${INTERFACES}; do
   cat <<CONF >>supervisord.conf
 [program:dumpcap-${intf}]
-command=/usr/bin/dumpcap -p -q -i ${intf} -b filesize:${filesize} -b files:${ringsize} -P -w %(here)s/pcap/${intf}.pcap -f '${filter}' -s 65535
+command=/usr/bin/dumpcap -p -q -i ${intf} -b filesize:${filesize} -b files:${ringsize} -P -w /data/${intf}.pcap -f '${filter}' -s 65535
 priority=20
 autorestart=true
 redirect_stderr=true

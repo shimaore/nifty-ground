@@ -197,7 +197,7 @@ Toolbox
     debug = (require 'debug') "#{pkg.name}:munin"
     zlib = require 'zlib'
 
-    trace_dir = path.join process.cwd(), 'pcap'
+    trace_dir = '/data'
 
     seconds = 1000
     minutes = 60*seconds

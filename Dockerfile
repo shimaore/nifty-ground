@@ -41,6 +41,7 @@ WORKDIR /opt/nifty-ground
 RUN chown -R nifty-ground .
 
 USER nifty-ground
+VOLUME /data
 RUN mkdir -p log pcap
 RUN npm install \
   && npm install coffee-script \

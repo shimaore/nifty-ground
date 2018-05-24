@@ -9,7 +9,7 @@
 
 # Host trace server
 
-    default_workdir = path.join process.cwd(), 'pcap'
+    default_workdir = '/data'
 
     class TraceError extends Error
 

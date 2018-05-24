@@ -5,7 +5,7 @@
     pkg = require '../package.json'
     assert = require 'assert'
 
-    trace_dir = path.join process.cwd(), 'pcap'
+    trace_dir = '/data'
     ringsize = process.env.RINGSIZE ? 50
     assert process.env.INTERFACES?, 'Missing INTERFACES environment variable'
     interfaces = process.env.INTERFACES.split /\s+/
