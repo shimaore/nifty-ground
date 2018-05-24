@@ -1,47 +1,43 @@
+    (require 'chai').should()
+
     req = require 'superagent'
     describe 'Munin', ->
       munin = require '../src/munin'
 
       app = null
       before ->
-        fs.rmdirAsync 'pcap'
-          .catch -> yes
+        process.env.DATA_DIR = 'does not exist'
         app = munin
           web:
             host: '127.0.0.1'
             port: 3939
 
       after ->
+        delete process.env.DATA_DIR
         app.server.close()
 
       it 'should autoconf', ->
-        req
-        .get 'http://127.0.0.1:3939/autoconf'
-        .then (res) ->
-          assert res.ok
-          assert res.text is 'yes\n'
+        res = await req.get 'http://127.0.0.1:3939/autoconf'
+        res.should.have.property 'ok', true
+        res.should.have.property 'text', 'yes\n'
 
       it 'should conf', ->
-        req
-        .get 'http://127.0.0.1:3939/config'
-        .then (res) ->
-          assert res.ok
-          assert res.text.match /^multigraph dumpcap_reasons_abs/
+        res = await req.get 'http://127.0.0.1:3939/config'
+        res.should.have.property 'ok', true
+        res.text.should.match /^multigraph dumpcap_reasons_abs/
 
       it 'should fallback nicely', ->
-        req
-        .get 'http://127.0.0.1:3939/'
-        .then (res) ->
-          assert res.ok
-          assert.strictEqual res.text, ''
+        res = await req.get 'http://127.0.0.1:3939/'
+        res.should.have.property 'ok', true
+        res.should.have.property 'text', ''
 
     describe 'Munin with dir', ->
       munin = require '../src/munin'
       app = null
 
       before ->
-        fs.mkdirAsync 'pcap'
-          .catch -> yes
+        await fs.mkdirAsync 'data1'
+        process.env.DATA_DIR = 'data1'
         app = munin
           web:
             host: '127.0.0.1'
@@ -49,21 +45,20 @@
 
       after ->
         app.server.close()
-        fs.rmdirAsync 'pcap'
+        delete process.env.DATA_DIR
+        await fs.rmdirAsync 'data1'
 
       it 'should handle empty dir', ->
-        req
-        .get 'http://127.0.0.1:3940/'
-        .then (res) ->
-          assert res.ok
-          assert res.text.match /^multigraph dumpcap_reasons_abs\ndumpcap_reasons_abs_200.value 0/
+        res = await req.get 'http://127.0.0.1:3940/'
+        res.should.have.property 'ok', true
+        res.text.should.match /^multigraph dumpcap_reasons_abs\ndumpcap_reasons_abs_200.value 0/
 
     describe 'Munin with file', ->
       munin = require '../src/munin'
       app = null
 
       before ->
-        pcap = new Buffer '''
+        pcap = Buffer.from '''
         1MOyoQIABAAAAAAAAAAAAAAABAABAAAAPuOHVXAyAwBVAAAAVQAAAJD2UkbK1mBsZi+KyAgARQAA
         R1PJQABAERVOwKgF5QoBAQGz4xPEADM3V1NJUC8yLjAgNDA3IFVuYXV0aG9yaXplZApDU2VxOiAz
         MTI2IElOVklURQo+44dVWTcDAHEAAABxAAAAYGxmL4rIkPZSRsrWCABFwABjldUAAD8BE3YKAQEB
@@ -85,7 +80,7 @@
         5QoBAQHOJRPEADcNSlNJUC8yLjAgNjA0IEV4Y3VzZSBtZQpDU2VxOiA3MjgxNzI4MTcyNiBJTlZJ
         VEUK
         ''', 'base64'
-        pcap_gz = new Buffer '''
+        pcap_gz = Buffer.from '''
         H4sICHUEM1cAA2Zvby5wY2FwALtyeNNCJgYWBgRgYWAEknaP20MLjJgZQoFsEJ7wLcjt1LWEnDT9
         rhMcDK4MDO7BJx0YHARF/Q6sYH3KxcjIuPmx8BEGY/PwYM8AfSM9AwUTA3OF0LzE0pKM/KLMqtQU
         Lufg1EIrBWNDIzMFT78wzxBXLpAlkebMDIVAC0AYYjzEKqAlBxiSp15lYLBnFC4DWQCyiJn53AWQ
@@ -96,34 +91,27 @@
         kMtYzsG0n1MFajfn9YL53MzARMG1Irm0OFUhNxXqd3MjC0MIhiddkEW3czgYSoGWlGLzQ/qqVJAf
         /j1E8sMVqB/AjrAXZKXUEQDIRiq9PgQAAA==
         ''', 'base64'
-        fs.mkdirAsync 'pcap'
-          .catch -> yes
-        .then ->
-          fs.writeFileAsync 'pcap/eth1_00832_20150101120000.pcap', pcap
-        .then ->
-          fs.writeFileAsync 'pcap/eth1_00833_20150101120010.pcap.gz', pcap_gz
-        .then ->
-          app = munin
-            web:
-              host: '127.0.0.1'
-              port: 3941
-              timespan: new Date() - new Date '2015-01-01'
+        await fs.mkdirAsync 'data2'
+        await fs.writeFileAsync 'data2/eth1_00832_20150101120000.pcap', pcap
+        await fs.writeFileAsync 'data2/eth1_00833_20150101120010.pcap.gz', pcap_gz
+        process.env.DATA_DIR = 'data2'
+        app = munin
+          web:
+            host: '127.0.0.1'
+            port: 3941
+            timespan: new Date() - new Date '2015-01-01'
 
       after ->
         app.server.close()
-        fs.unlinkAsync 'pcap/eth1_00832_20150101120000.pcap'
-        .then ->
-          fs.unlinkAsync 'pcap/eth1_00833_20150101120010.pcap.gz'
-        .then ->
-          fs.rmdirAsync 'pcap'
+        delete process.env.DATA_DIR
+        await fs.unlinkAsync 'data2/eth1_00832_20150101120000.pcap'
+        await fs.unlinkAsync 'data2/eth1_00833_20150101120010.pcap.gz'
+        await fs.rmdirAsync 'data2'
 
       it 'should read pcap file', ->
-        req
-        .get 'http://127.0.0.1:3941/'
-        .then (res) ->
-          assert res.ok
-          assert res.text.match /^multigraph dumpcap_reasons_abs\ndumpcap_reasons_abs_200.value 0[^]*dumpcap_reasons_abs_407.value 4\n/
+        res = await req.get 'http://127.0.0.1:3941/'
+        res.should.have.property 'ok', true
+        res.text.should.match /^multigraph dumpcap_reasons_abs\ndumpcap_reasons_abs_200.value 0[^]*dumpcap_reasons_abs_407.value 4\n/
 
-    assert = require 'assert'
     {promisifyAll} = require 'bluebird'
     fs = promisifyAll require 'fs'

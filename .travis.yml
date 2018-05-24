@@ -2,17 +2,17 @@ sudo: required
 
 language: node_js
 node_js:
-- "8"
+- "10"
 
 services:
 - docker
 
 before_install:
-- docker pull debian:testing-slim
+- docker pull node:alpine
 
 script:
 - docker build -t "shimaore/nifty-ground:latest" .
-- docker run -t -i --rm "shimaore/nifty-ground:latest" npm test
+- docker run -t -i --rm -v /tmp:/data "shimaore/nifty-ground:latest" npm test
 
 after_success:
 - docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"

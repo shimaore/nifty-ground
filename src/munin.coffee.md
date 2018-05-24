@@ -1,7 +1,51 @@
 Web Services for Munin
 ======================
 
+    {debug,foot} = (require 'tangible') "nifty-ground:munin"
+
+    reducer = (acc,{count,total}) ->
+      counts = Object.assign {}, acc.count
+      for own k,v of count
+        counts[k] ?= 0
+        counts[k] += v
+      total: acc.total + total
+      count: counts
+
+    parse_file = ({now,since,name,full_name,compressed}) ->
+      debug "Going to parse #{if compressed then 'compressed' else 'uncompressed'} file #{name} at #{full_name}"
+      new Promise (resolve,reject) ->
+
+        count = {}
+        total = 0
+
+        try
+          input = fs.createReadStream full_name
+          input = input.pipe zlib.createGunzip() if compressed
+          parser = parse input
+          parser.on 'packet', ({header:{timestampSeconds},data}) ->
+
+            time = new Date timestampSeconds*1000
+            return unless since < time < now
+
+            content = data.toString 'ascii'
+
+FIXME: This is highly unsatisfactory as it will also match (as the data example shows) ICMP response packets.
+
+            m = content.match /SIP\/2.0 ([2-6]\d\d) [^]*CSeq: \d+ INVITE/i
+            return unless m
+            count[m[1]] ?= 0
+            count[m[1]]++
+            total++
+          parser.on 'end', ->
+            debug "Retained #{total} packets", full_name
+            resolve {count,total}
+
+        catch error
+          reject error
+
     run = (cfg) -> Zappa cfg.web, ->
+
+      trace_dir = process.env.DATA_DIR ? '/data'
 
       @get '/autoconf', ->
         @send 'yes\n'
@@ -13,87 +57,63 @@ Web Services for Munin
 
       @get '/', ->
 
-        now = new Date()
-        since = new Date now - cfg.web.timespan
-        count = {}
-        total = 0
-
-        fs.readdirAsync trace_dir
-        .map (name)  ->
-          new Promise (resolve,reject) ->
-            try
-              return unless m = name.match /^eth[^_]+_\d+_\d+.pcap(.gz)?$/
-              full_name = path.join trace_dir, name
-              debug "Going to parse", full_name
-              input = fs.createReadStream full_name
-              input = input.pipe zlib.createGunzip() if m[1]?
-              parser = parse input
-              parser.on 'packet', ({header:{timestampSeconds},data}) ->
-
-                time = new Date timestampSeconds*1000
-                return unless since < time < now
-
-                content = data.toString 'ascii'
-
-FIXME: This is highly unsatisfactory as it will also match (as the data example shows) ICMP response packets.
-
-                m = content.match /SIP\/2.0 ([2-6]\d\d) [^]*CSeq: \d+ INVITE/i
-                return unless m
-                count[m[1]] ?= 0
-                count[m[1]]++
-                total++
-              parser.on 'end', ->
-                debug "Retained #{total} packets", full_name
-                resolve()
-
-            catch error
-              reject error
-
 Since each parser opens a file, keep at most 20 of them open at any given time.
 
-        , concurrency: 20
-        .then ->
-          response_abs = ''
-          response_rel = ''
-          for entry in colors
-            {code} = entry
-            value = count[code] ? 0
+        now = new Date()
+        since = new Date now - cfg.web.timespan
+
+        {count,total} = await fs
+          .readdirAsync trace_dir
+          .map (name) -> name.match /^eth[^_]+_\d+_\d+.pcap(.gz)?$/
+          .filter (m) -> m?
+          .map (m) ->
+            name = m.input
+            full_name = path.join trace_dir, name
+            compressed = m[1]?
+            {now,since,name,full_name,compressed}
+          .map parse_file, concurrency: 20
+          .reduce reducer, total: 0, count: {}
+          .catch (error) =>
+            debug "readdir/parse failed: #{error}", error.stack
+            {}
+
+        unless total?
+          @send ''
+          return
+
+        response_abs = ''
+        response_rel = ''
+        for entry in colors
+          {code} = entry
+          value = count[code] ? 0
 
 Response for the 'absolute' graph
 
-            response_abs += """
-              #{name}_abs_#{code}.value #{value}
+          response_abs += """
+            #{name}_abs_#{code}.value #{value}
 
-            """
+          """
 
 Response for the 'relative' (percent) graph
 
-            rel_value = if total is 0
-                0
-              else
-                (value*100.0/total).toFixed 2
+          rel_value = if total is 0
+              0
+            else
+              (value*100.0/total).toFixed 2
 
-            response_rel += """
-              #{name}_#{code}.value #{rel_value}
+          response_rel += """
+            #{name}_#{code}.value #{rel_value}
 
-            """
+          """
 
 Build the complete response.
 
-          """
-            multigraph #{name}_abs
-            #{response_abs}
-            multigraph #{name}
-            #{response_rel}
-          """
-
-        .then (response) =>
-          @send response
-          return
-        .catch (error) =>
-          debug "#{error} while processing #{trace_dir}"
-          @send ''
-          return
+        @send """
+          multigraph #{name}_abs
+          #{response_abs}
+          multigraph #{name}
+          #{response_rel}
+        """
 
 Colors
 ======
@@ -188,16 +208,12 @@ Munin Configuration
 Toolbox
 =======
 
-    Promise = require 'bluebird'
+    {promisifyAll} = require 'bluebird'
     {parse} = require 'pcap-parser'
     Zappa = require 'zappajs'
-    fs = Promise.promisifyAll require 'fs'
+    fs = promisifyAll require 'fs'
     path = require 'path'
-    pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:munin"
     zlib = require 'zlib'
-
-    trace_dir = '/data'
 
     seconds = 1000
     minutes = 60*seconds

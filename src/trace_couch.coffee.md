@@ -18,7 +18,7 @@ the request a second time.
     {promisifyAll} = require 'bluebird'
     fs = promisifyAll require 'fs'
     pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg}:trace_couch"
+    debug = (require 'tangible') "#{pkg}:trace_couch"
 
     module.exports = (doc) ->
       debug "start", doc

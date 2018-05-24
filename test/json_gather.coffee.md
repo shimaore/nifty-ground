@@ -1,6 +1,5 @@
     chai = require 'chai'
     chai.should()
-    chai.use require 'chai-as-promised'
 
     {EventEmitter} = require 'events'
 
@@ -17,4 +16,4 @@
         stream.emit 'data', 'b'
         stream.emit 'data', 'e'
         stream.emit 'end'
-        uut.should.eventually.deep.equal ['a','b','e']
+        (await uut).should.deep.equal ['a','b','e']

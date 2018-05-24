@@ -9,7 +9,7 @@
     {EventEmitter} = require 'events'
     pcap_tail = require './pcap_tail'
     pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg}:packet_server"
+    debug = (require 'tangible') "#{pkg}:packet_server"
 
     minutes = 60*1000 # milliseconds
 

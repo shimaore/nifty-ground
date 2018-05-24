@@ -1,5 +1,5 @@
     pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg.name}:periodic"
+    debug = (require 'tangible') "#{pkg.name}:periodic"
 
 Cleanup the trace directory every hour
 --------------------------------------

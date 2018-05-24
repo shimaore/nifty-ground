@@ -5,11 +5,11 @@
     packet_server = require './packet_server'
     wireshark_date = require './wireshark_date'
     pkg = require '../package.json'
-    debug = (require 'debug') "#{pkg}:trace"
+    debug = (require 'tangible') "#{pkg}:trace"
 
 # Host trace server
 
-    default_workdir = '/data'
+    default_workdir = process.env.DATA_DIR ? '/data'
 
     class TraceError extends Error
 

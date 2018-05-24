@@ -5,7 +5,7 @@
     pkg = require '../package.json'
     assert = require 'assert'
 
-    trace_dir = '/data'
+    trace_dir = process.env.DATA_DIR ? '/data'
     ringsize = process.env.RINGSIZE ? 50
     assert process.env.INTERFACES?, 'Missing INTERFACES environment variable'
     interfaces = process.env.INTERFACES.split /\s+/
@@ -13,7 +13,7 @@
     seconds = 1000
     minutes = 60*seconds
 
-    debug = (require 'debug') "#{pkg.name}:cleanup"
+    debug = (require 'tangible') "#{pkg.name}:cleanup"
 
     module.exports = (new_interfaces) ->
       interfaces = new_interfaces if new_interfaces?
