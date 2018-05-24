@@ -1,7 +1,7 @@
 {
   "name": "nifty-ground",
   "docker_name": "shimaore/nifty-ground",
-  "version": "3.0.6",
+  "version": "3.0.7",
   "description": "SIP sniffer traces",
   "keywords": [
     "SIP",
