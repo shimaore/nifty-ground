@@ -1,18 +1,18 @@
     pkg = require '../package.json'
     {debug,foot} = (require 'tangible') "#{pkg.name}:server"
 
-    assert = require 'assert'
-    assert process.env.HOSTNAME?, 'The HOSTNAME environment variale is required.'
-
     config = require 'ccnq4-config'
 
     trace_couch = require './trace_couch'
-    hostname = process.env.HOSTNAME
 
 Request handler
 ---------------
 
     main = ->
+
+      assert = require 'assert'
+      assert process.env.HOSTNAME?, 'The HOSTNAME environment variable is required.'
+      hostname = process.env.HOSTNAME
 
       cfg = config()
 
@@ -42,4 +42,6 @@ Wait for a trace request.
 
       console.log "#{pkg.name} #{pkg.version} ready on #{hostname}"
 
-    do main
+    module.exports = main
+    if module is require.main
+      do main

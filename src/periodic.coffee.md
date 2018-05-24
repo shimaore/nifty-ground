@@ -7,12 +7,17 @@ Cleanup the trace directory every hour
     cleanup = require './cleanup'
     hourly = 60*60*1000
 
-    setInterval ->
+    main = ->
+      setInterval ->
 
 FIXME should try to retrieve `new_interfaces`
 
-      try
-        cleanup()
-      catch error
-        debug "Cleanup: #{error}"
-    , hourly
+        try
+          cleanup()
+        catch error
+          debug "Cleanup: #{error}"
+      , hourly
+
+    module.exports = main
+    if module is require.main
+      do main
