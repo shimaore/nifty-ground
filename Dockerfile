@@ -38,5 +38,5 @@ USER root
 RUN mkdir /data && chown nifty-ground /data
 VOLUME /data
 
-ENTRYPOINT ["/opt/nifty-ground/docker-entrypoint.sh]
+ENTRYPOINT ["/opt/nifty-ground/docker-entrypoint.sh"]
 CMD ["/opt/nifty-ground/supervisord.conf.sh"]

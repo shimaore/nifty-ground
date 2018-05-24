@@ -12,7 +12,7 @@ before_install:
 
 script:
 - docker build -t "shimaore/nifty-ground:latest" .
-- docker run -t -i --rm -v /tmp:/data "shimaore/nifty-ground:latest" npm test
+- docker run --rm -v /tmp:/data "shimaore/nifty-ground:latest" npm test
 
 after_success:
 - docker login -u "${DOCKER_USERNAME}" -p "${DOCKER_PASSWORD}"
