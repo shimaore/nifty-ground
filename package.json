@@ -12,6 +12,7 @@
   "author": "Stephane Alnet <stephane@shimaore.net>",
   "dependencies": {
     "bluebird": "^3.5.1",
+    "ccnq4-config": "^1.0.0",
     "ccnq4-pouchdb": "^1.0.0",
     "pcap-parser": "0.2.1",
     "red-rings": "^1.1.4",

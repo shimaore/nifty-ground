@@ -2,8 +2,9 @@
     {debug,foot} = (require 'tangible') "#{pkg.name}:server"
 
     assert = require 'assert'
-    assert process.env.SOCKET?, 'The SOCKET environment variale is required.'
     assert process.env.HOSTNAME?, 'The HOSTNAME environment variale is required.'
+
+    config = require 'ccnq4-config'
 
     trace_couch = require './trace_couch'
     hostname = process.env.HOSTNAME
@@ -12,6 +13,8 @@ Request handler
 ---------------
 
     main = ->
+
+      cfg = config()
 
 Wait for a trace request.
 
