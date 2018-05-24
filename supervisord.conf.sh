@@ -1,7 +1,5 @@
 #!/bin/sh
 
-chown -R nifty-ground /data
-
 default_filesize=10000
 default_ringsize=50
 default_filter='udp portrange 5060-5299 or udp portrange 15060-15299 or icmp or tcp portrange 5060-5299 or tcp portrange 15060-15299'

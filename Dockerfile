@@ -7,6 +7,7 @@ RUN apk --update add \
   gzip \
   procps \
   supervisor \
+  su-exec \
   tshark \
   wireshark-common
 
@@ -32,5 +33,10 @@ RUN \
   npm run build && \
   npm cache -f clean
 
+USER root
+
+RUN mkdir /data && chown nifty-ground /data
 VOLUME /data
+
+ENTRYPOINT ["/opt/nifty-ground/docker-entrypoint.sh]
 CMD ["/opt/nifty-ground/supervisord.conf.sh"]
