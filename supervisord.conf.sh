@@ -21,21 +21,21 @@ port=127.0.0.1:2510
 supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface
 
 [program:server]
-command=/usr/bin/nice node %(here)s/src/server.js
+command=/bin/nice node %(here)s/src/server.js
 priority=40
 autorestart=true
 stdout_logfile=/data/server.log
 stderr_logfile=/data/server.error
 
 [program:periodic]
-command=/usr/bin/nice node %(here)s/src/periodic.js
+command=/bin/nice node %(here)s/src/periodic.js
 priority=60
 autorestart=true
 stdout_logfile=/data/periodic.log
 stderr_logfile=/data/periodic.error
 
 [program:munin]
-command=/usr/bin/nice node %(here)s/src/munin.js
+command=/bin/nice node %(here)s/src/munin.js
 priority=60
 autorestart=true
 stdout_logfile=/data/munin.log
