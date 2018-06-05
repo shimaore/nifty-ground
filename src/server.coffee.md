@@ -1,6 +1,7 @@
     pkg = require '../package.json'
     {debug,foot} = (require 'tangible') "#{pkg.name}:server"
     RedRingAxon = require 'red-rings-axon'
+    {UPDATE} = require 'red-rings/operations'
 
     config = require 'ccnq4-config'
 
