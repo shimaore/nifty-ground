@@ -36,7 +36,9 @@ the request a second time.
 
       packets = await json_gather self
       doc.packets = packets
-      b = await dest.put doc
+      {rev} = await dest.put doc
+      doc._rev = rev
+      doc.state = 'trace_completed'
 
 We cannot use PouchDB's attachment methods because they would require to store the object in memory in a Buffer.
 
@@ -45,7 +47,7 @@ We cannot use PouchDB's attachment methods because they would require to store t
         baseUrl: uri
         uri: "#{qs.escape doc._id}/packets.pcap"
         qs:
-          rev: b.rev
+          rev: rev
         headers:
           'Content-Type': 'application/vnd.tcpdump.pcap'
           'Accept': 'json'
@@ -66,4 +68,4 @@ FIXME: Retry the PUT once if it failed.
       debug "Going to save #{pcap} to #{uri}"
       stream.pipe req
       debug "Piping #{pcap} to #{uri}"
-      null
+      doc

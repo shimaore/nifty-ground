@@ -28,18 +28,20 @@ Wait for a trace request.
 - `reference`
 
         rr.notify msg.id, msg.id,
-          _id: msg.id
           state: 'trace_started',
           host:hostname
 
         debug "received trace request #{JSON.stringify msg.doc}"
-        error = await trace_couch(msg.doc).catch (error) -> error.toString()
+        doc = await trace_couch(msg.doc).catch (error) -> error: error.toString()
 
-        rr.notify msg.id, msg.id,
-          _id: msg.id
-          state: 'trace_completed',
-          host:hostname
-          error: error
+        if doc.error?
+          rr.notify msg.id, msg.id,
+            state: 'trace_error',
+            host:hostname
+            error: doc.error
+          return
+
+        rr.notify doc._id, msg.id, doc
 
       console.log "#{pkg.name} #{pkg.version} ready on #{hostname}"
 
