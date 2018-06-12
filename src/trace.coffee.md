@@ -4,8 +4,7 @@
     {isIPv4,isIPv6} = require 'net'
     packet_server = require './packet_server'
     wireshark_date = require './wireshark_date'
-    pkg = require '../package.json'
-    debug = (require 'tangible') "#{pkg}:trace"
+    debug = (require 'tangible') "nifty-ground:trace"
 
 # Host trace server
 

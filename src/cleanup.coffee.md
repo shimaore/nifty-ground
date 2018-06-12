@@ -2,13 +2,12 @@
     fs = promisifyAll require 'fs'
     path = require 'path'
     spawn = require('child_process').spawn
-    pkg = require '../package.json'
     assert = require 'assert'
 
     seconds = 1000
     minutes = 60*seconds
 
-    debug = (require 'tangible') "#{pkg.name}:cleanup"
+    debug = (require 'tangible') "nifty-ground:cleanup"
 
     module.exports = (new_interfaces) ->
       trace_dir = process.env.DATA_DIR ? '/data'

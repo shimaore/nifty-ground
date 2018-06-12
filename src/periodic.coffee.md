@@ -1,5 +1,4 @@
-    pkg = require '../package.json'
-    debug = (require 'tangible') "#{pkg.name}:periodic"
+    debug = (require 'tangible') "nifty-ground:periodic"
 
 Cleanup the trace directory every hour
 --------------------------------------

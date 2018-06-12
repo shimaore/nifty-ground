@@ -17,8 +17,7 @@ the request a second time.
     url = require 'url'
     {promisifyAll} = require 'bluebird'
     fs = promisifyAll require 'fs'
-    pkg = require '../package.json'
-    debug = (require 'tangible') "#{pkg}:trace_couch"
+    debug = (require 'tangible') "nifty-ground:trace_couch"
 
     module.exports = (doc) ->
       debug "start", doc
