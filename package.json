@@ -38,12 +38,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/shimaore/nifty-ground.git"
+    "url": "https://gitlab.com/shimaore/nifty-ground.git"
   },
   "bugs": {
-    "url": "https://github.com/shimaore/nifty-ground/issues"
+    "url": "https://gitlab.com/shimaore/nifty-ground/issues"
   },
-  "homepage": "https://github.com/shimaore/nifty-ground",
+  "homepage": "https://gitlab.com/shimaore/nifty-ground",
   "main": "index.js",
   "directories": {
     "test": "test"
