@@ -23,7 +23,7 @@ Wait for a trace request.
       rr = new RedRingAxon cfg.axon ? {}
       rr.receive 'trace:*'
       .filter ({op}) -> op is UPDATE
-      .forEach foot (msg) ->
+      .observe foot (msg) ->
 
 - `_id`: `trace:<reference>`
 - `reference`
@@ -43,6 +43,8 @@ Wait for a trace request.
           return
 
         rr.notify doc._id, msg.id, doc
+
+      .catch console.error
 
       console.log "#{pkg.name} #{pkg.version} ready on #{hostname}"
 
