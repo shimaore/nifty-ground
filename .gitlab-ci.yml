@@ -1,0 +1,26 @@
+build:
+  stage: build
+  before_script:
+  - docker login -u gitlab-ci-token -p ${CI_BUILD_TOKEN} ${CI_REGISTRY}
+  script:
+  - docker build -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} .
+  - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+
+publish:
+  stage: deploy
+  only:
+  - tags
+  before_script:
+  - docker login -u gitlab-ci-token -p ${CI_BUILD_TOKEN} ${CI_REGISTRY}
+  script:
+  - docker pull ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+  - docker tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
+  - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
+
+test:
+  stage: test
+  before_script:
+  - docker login -u gitlab-ci-token -p ${CI_BUILD_TOKEN} ${CI_REGISTRY}
+  script:
+  - docker pull ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}
+  - docker run --rm ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} npm test
