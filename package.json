@@ -19,7 +19,6 @@
     "red-rings": "^2.0.0",
     "red-rings-axon": "^2.1.5",
     "request": "^2.88.0",
-    "socket.io-client": "^2.1.1",
     "stream-buffers": "^3.0.2",
     "tangible": "^2.0.0",
     "zappajs": "^6.5.0"
