@@ -142,6 +142,7 @@ Colors
       { code:455, color:"ff8000" }
       { code:480, color:"ff9070" }
       { code:481, color:"ffa070" }
+      { code:482, color:"ffa670" }
       { code:484, color:"ffb000" }
       { code:485, color:"ffc000" }
       { code:486, color:"7f1030" }
