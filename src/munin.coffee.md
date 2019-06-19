@@ -20,8 +20,14 @@ Web Services for Munin
 
         try
           input = createReadStream full_name
-          input = input.pipe zlib.createGunzip() if compressed
+          input.on 'error', (error) -> console.error 'input', full_name, error
+          if compressed
+            dec = zlib.createGunzip()
+            dec.on 'error', (error) -> console.error 'gunzip', full_name, error
+            input = input.pipe dec
+            input.on 'error', (error) -> console.error 'gunzip input', full_name, error
           parser = parse input
+          parser.on 'error', (error) -> console.error 'parser', full_name, error
           parser.on 'packet', ({header:{timestampSeconds},data}) ->
 
             time = new Date timestampSeconds*1000

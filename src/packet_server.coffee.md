@@ -116,6 +116,11 @@ it will trigger three event types:
 
       run = (intf) ->
 
+We _have_ to use a file because tshark cannot read from a pipe/fifo/stdin.
+(And we need tshark for its filtering and field selection features.)
+
+        fh = "#{trace_dir}/.tmp.cap1.#{Math.random()}"
+
         ## Select the proper packets
         tshark_command = [
           'tshark', '-r', fh, '-Y', options.tshark_filter, '-nltud', '-o', 'gui.column.format:Time,%Yut', '-T', 'fields', tshark_fields...
@@ -128,6 +133,7 @@ it will trigger three event types:
         # stream is tshark.stdout
         tshark_pipe = (stream) ->
           debug "tshark_pipe"
+          stream.on 'error', (error) -> console.error 'tshark_pipe', error
           linestream = byline stream
           linestream.on 'data', (line) ->
             data = tshark_line_parser line
@@ -149,7 +155,7 @@ Locate xref
           linestream.on 'end', ->
             self.end()
           linestream.on 'error', ->
-            debug "tshark_pipe: linestream error"
+            console.error "tshark_pipe: linestream error", error
             seld.end()
           return
 
@@ -183,11 +189,6 @@ Locate xref
 
         debug "run", intf
 
-We _have_ to use a file because tshark cannot read from a pipe/fifo/stdin.
-(And we need tshark for its filtering and field selection features.)
-
-        fh = "#{trace_dir}/.tmp.cap1.#{Math.random()}"
-
 # Generate a merged capture file
 
 This function tests whether a file is an acceptable input PCAP file name.
@@ -219,12 +220,12 @@ The idea is that we produce _some_ input even if we can't read all the files.
 
           files.sort (a,b) -> a.time - b.time
 
-`proper_files` now contains a sorted list of *pcap* files.
+`files` now contains a sorted list of *pcap* files.
 We build a stash using the last 500 packets matching `ngrep_filter`.
 
           stash = []
 
-          for file in proper_files
+          for file in files
             await do (file_name = file.name) ->
 
 We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
@@ -232,7 +233,12 @@ We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
               try
                 debug "parsing #{file_name}"
                 input = createReadStream file_name
-                input = input.pipe zlib.createGunzip() if file_name.match /gz$/
+                input.on 'error', (error) -> console.error 'input', file_name, error
+                if file_name.match /gz$/
+                  dec = zlib.createGunzip()
+                  dec.on 'error', (error) -> console.error 'gunzip', file_name, error
+                  input = input.pipe dec
+                  input.on 'error', (error) -> console.error 'gunzip input', file_name, error
                 await pcap_tail.tail input, options.ngrep_filter, options.ngrep_limit ? 500, stash
 
               catch error

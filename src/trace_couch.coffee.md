@@ -13,10 +13,17 @@ the request a second time.
     json_gather = require './json_gather'
     trace = require './trace'
     qs = require 'querystring'
-    fs = (require 'fs').promises
+    {createReadStream,promises:fs} = require 'fs'
     debug = (require 'tangible') "nifty-ground:trace_couch"
 
     module.exports = (doc) ->
+      try
+        await handle doc
+      catch error
+        doc.error = error
+      doc
+
+    handle = (doc) ->
       debug "start", doc
       assert doc.reference?, 'The `reference` parameter is required'
 
@@ -31,14 +38,19 @@ the request a second time.
       doc._id = [doc.type, doc.reference, doc.host].join ':'
 
       packets = await json_gather self
+
+      debug "Trace #{doc.reference} completed, savings #{packets.length} packets."
+
       doc.packets = packets
       {rev} = await dest.put doc
       doc._rev = rev
       doc.state = 'trace_completed'
 
+      debug "Trace #{doc.reference} completed, uploading #{pcap}"
+
 We cannot use CouchDB's attachment methods because they would require to store the object in memory in a Buffer.
 
-      stream = fs.createReadStream pcap
+      stream = createReadStream pcap
 
       uri = new URL "#{qs.escape doc._id}/packets.pcap", dest.uri+'/'
       req = dest.agent
@@ -62,6 +74,7 @@ FIXME: Retry the PUT once if it failed.
         return
 
       debug "Going to save #{pcap} to #{uri}"
-      stream.pipe req
+      output = stream.pipe req
+      output.on 'error', (error) -> console.error 'output packets.pcap', doc._id, error
       debug "Piping #{pcap} to #{uri}"
       doc
