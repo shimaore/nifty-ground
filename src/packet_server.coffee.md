@@ -128,6 +128,7 @@ it will trigger three event types:
         # stream is tshark.stdout
         tshark_pipe = (stream) ->
           debug "tshark_pipe"
+          stream.on 'error', (error) -> console.error 'tshark_pipe', error
           linestream = byline stream
           linestream.on 'data', (line) ->
             data = tshark_line_parser line
@@ -149,7 +150,7 @@ Locate xref
           linestream.on 'end', ->
             self.end()
           linestream.on 'error', ->
-            debug "tshark_pipe: linestream error"
+            console.error "tshark_pipe: linestream error", error
             seld.end()
           return
 
@@ -232,7 +233,10 @@ We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
               try
                 debug "parsing #{file_name}"
                 input = createReadStream file_name
-                input = input.pipe zlib.createGunzip() if file_name.match /gz$/
+                input.on 'error', (error) -> console.error 'input', file_name, error
+                if file_name.match /gz$/
+                  input = input.pipe zlib.createGunzip()
+                  input.on 'error', (error) -> console.error 'gunzip input', file_name, error
                 await pcap_tail.tail input, options.ngrep_filter, options.ngrep_limit ? 500, stash
 
               catch error
