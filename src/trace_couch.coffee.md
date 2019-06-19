@@ -8,25 +8,29 @@ Also this allows to directly access the raw PCAP output without sending
 the request a second time.
 
     assert = require 'assert'
-    request = require 'request'
-    PouchDB = require 'ccnq4-pouchdb'
+    CouchDB = require 'most-couchdb'
 
     json_gather = require './json_gather'
     trace = require './trace'
     qs = require 'querystring'
-    url = require 'url'
-    {promisifyAll} = require 'bluebird'
-    fs = promisifyAll require 'fs'
+    {createReadStream,promises:fs} = require 'fs'
     debug = (require 'tangible') "nifty-ground:trace_couch"
 
     module.exports = (doc) ->
+      try
+        await handle doc
+      catch error
+        doc.error = error
+      doc
+
+    handle = (doc) ->
       debug "start", doc
       assert doc.reference?, 'The `reference` parameter is required'
 
       uri = doc.upload_uri ? process.env.UPLOAD
       assert uri?, 'Either the `upload_uri` parameter or the UPLOAD environment variable is required.'
 
-      dest = new PouchDB uri
+      dest = new CouchDB uri
       [self,pcap] = trace doc
 
       doc.type = 'trace'
@@ -34,23 +38,26 @@ the request a second time.
       doc._id = [doc.type, doc.reference, doc.host].join ':'
 
       packets = await json_gather self
+
+      debug "Trace #{doc.reference} completed, savings #{packets.length} packets."
+
       doc.packets = packets
       {rev} = await dest.put doc
       doc._rev = rev
       doc.state = 'trace_completed'
 
-We cannot use PouchDB's attachment methods because they would require to store the object in memory in a Buffer.
+      debug "Trace #{doc.reference} completed, uploading #{pcap}"
 
-      stream = fs.createReadStream pcap
-      req = request.put
-        baseUrl: uri
-        uri: "#{qs.escape doc._id}/packets.pcap"
-        qs:
-          rev: rev
-        headers:
-          'Content-Type': 'application/vnd.tcpdump.pcap'
-          'Accept': 'json'
-        timeout: 60000
+We cannot use CouchDB's attachment methods because they would require to store the object in memory in a Buffer.
+
+      stream = createReadStream pcap
+
+      uri = new URL "#{qs.escape doc._id}/packets.pcap", dest.uri+'/'
+      req = dest.agent
+        .put uri.toString()
+        .query {rev}
+        .type 'application/vnd.tcpdump.pcap'
+        .accept 'json'
 
       req.on 'error', (error) ->
         debug "put packet.pcap: #{error}"
@@ -60,11 +67,14 @@ FIXME: Retry the PUT once if it failed.
 
       req.on 'response', (res) ->
         debug "Done saving to #{uri}, ok=#{res.ok}, text=#{res.text}"
-        fs.unlinkAsync pcap
-        .catch (error) ->
+        try
+          await fs.unlink pcap
+        catch error
           debug "#{error} while unlinking #{pcap}"
+        return
 
       debug "Going to save #{pcap} to #{uri}"
-      stream.pipe req
+      output = stream.pipe req
+      output.on 'error', (error) -> console.error 'output packets.pcap', doc._id, error
       debug "Piping #{pcap} to #{uri}"
       doc
