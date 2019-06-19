@@ -5,6 +5,15 @@ Provides two methods on a 'stash' (Array) of packet descriptions:
 
     pcapp = require 'pcap-parser'
 
+    wait_for = (emitter,event,timeout) ->
+      new Promise (resolve,reject) ->
+        expired = setTimeout reject, timeout
+        emitter.once event, (value) ->
+          clearTimeout expired
+          resolve value
+          return
+        return
+
     module.exports =
 
 - `tail` will parse a PCAP input stream, match a `regex` on the packet data if provided, and only keep the last `max_lenght` packets.
@@ -33,49 +42,47 @@ Provides two methods on a 'stash' (Array) of packet descriptions:
             parser.on 'end', ->
               resolve stash
 
+            parser.on 'error', (error) ->
+              console.error 'parser', error
+              reject error
+
           catch error
             reject error
 
 - `write` will output a PCAP stream from a stash of packets.
 
       write: (output_stream,stash) ->
+        output_stream.on 'error', (error) ->
+          console.error 'pcap_tail.write', error
 
-        new Promise (resolve,reject) ->
-          try
-            write_packet = (packet,cb) ->
-              # Packet Header
-              b = new Buffer PACKET_HEADER_LENGTH
-              b.writeUInt32LE packet.header.timestampSeconds, 0
-              b.writeUInt32LE packet.header.timestampMicroseconds, 4
-              b.writeUInt32LE packet.header.capturedLength, 8
-              b.writeUInt32LE packet.header.originalLength, 12
-              output_stream.write b
-              if output_stream.write packet.data
-                  do cb
-              else
-                output_stream.once 'drain', cb
-              return
+        send = (data) ->
+          unless output_stream.write data
+            await wait_for output_stream, 'drain', 1000
+          return
 
-            # Global Header
-            b = new Buffer GLOBAL_HEADER_LENGTH
-            b.writeUInt32LE 0xa1b2c3d4, 0
-            b.writeUInt16LE 2, 4
-            b.writeUInt16LE 4, 6
-            b.writeUInt32LE stash.globalHeader?.gmtOffset ? 0, 8
-            b.writeUInt32LE stash.globalHeader?.timestampAccuracy ? 0, 12
-            b.writeUInt32LE stash.globalHeader?.snapshotLength ? 65535, 16
-            b.writeUInt32LE stash.globalHeader?.linkLayerType ? 1, 20
-            output_stream.write b
+        write_packet = (packet) ->
+          # Packet Header
+          b = new Buffer PACKET_HEADER_LENGTH
+          b.writeUInt32LE packet.header.timestampSeconds, 0
+          b.writeUInt32LE packet.header.timestampMicroseconds, 4
+          b.writeUInt32LE packet.header.capturedLength, 8
+          b.writeUInt32LE packet.header.originalLength, 12
+          await send b
+          await sned packet.data
+          return
 
-            do next = ->
-              return if stash.completed
-              if stash.length > 0
-                packet = stash.shift()
-                write_packet packet, next
-              else
-                stash.completed = true
-                output_stream.end resolve
-              return
-            return
-          catch error
-            reject error
+        # Global Header
+        b = new Buffer GLOBAL_HEADER_LENGTH
+        b.writeUInt32LE 0xa1b2c3d4, 0
+        b.writeUInt16LE 2, 4
+        b.writeUInt16LE 4, 6
+        b.writeUInt32LE stash.globalHeader?.gmtOffset ? 0, 8
+        b.writeUInt32LE stash.globalHeader?.timestampAccuracy ? 0, 12
+        b.writeUInt32LE stash.globalHeader?.snapshotLength ? 65535, 16
+        b.writeUInt32LE stash.globalHeader?.linkLayerType ? 1, 20
+        await send b
+
+        for packet in stash
+          packet = stash.shift()
+          await write_packet packet
+        return
