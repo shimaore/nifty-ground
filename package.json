@@ -11,28 +11,25 @@
   ],
   "author": "Stephane Alnet <stephane@shimaore.net>",
   "dependencies": {
-    "bluebird": "^3.5.1",
     "byline": "^5.0.0",
-    "ccnq4-config": "^1.0.0",
-    "ccnq4-pouchdb": "^1.1.2",
+    "ccnq4-config": "^1.0.1",
+    "core-zappa": "^1.1.1",
+    "most-couchdb": "^3.3.1",
     "pcap-parser": "0.2.1",
     "red-rings": "^2.0.0",
     "red-rings-axon": "^2.1.5",
-    "request": "^2.88.0",
-    "stream-buffers": "^3.0.2",
-    "tangible": "^2.0.0",
-    "zappajs": "^6.5.0"
+    "tangible": "^3.0.0"
   },
   "private": true,
   "devDependencies": {
-    "chai": "^4.1.2",
-    "coffeescript": "^2.3.0",
-    "mocha": "^5.2.0",
-    "superagent": "^3.8.3"
+    "chai": "^4.2.0",
+    "coffeescript": "^2.4.1",
+    "mocha": "^6.1.4",
+    "nyc": "^14.1.1"
   },
   "scripts": {
     "build": "npm install --only=dev && rm package-lock.json && coffee -c src/*.coffee.md && npm uninstall --only=dev",
-    "pretest": "npm install --only=dev && coffee -c test/*.coffee.md",
+    "pretest": "npm run build && coffee -c test/*.coffee.md",
     "test": "mocha"
   },
   "repository": {

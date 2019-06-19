@@ -36,7 +36,7 @@
       app = null
 
       before ->
-        await fs.mkdirAsync 'data1'
+        await fs.mkdir 'data1'
         process.env.DATA_DIR = 'data1'
         app = munin
           web:
@@ -46,7 +46,7 @@
       after ->
         app.server.close()
         delete process.env.DATA_DIR
-        await fs.rmdirAsync 'data1'
+        await fs.rmdir 'data1'
 
       it 'should handle empty dir', ->
         res = await req.get 'http://127.0.0.1:3940/'
@@ -91,9 +91,9 @@
         kMtYzsG0n1MFajfn9YL53MzARMG1Irm0OFUhNxXqd3MjC0MIhiddkEW3czgYSoGWlGLzQ/qqVJAf
         /j1E8sMVqB/AjrAXZKXUEQDIRiq9PgQAAA==
         ''', 'base64'
-        await fs.mkdirAsync 'data2'
-        await fs.writeFileAsync 'data2/eth1_00832_20150101120000.pcap', pcap
-        await fs.writeFileAsync 'data2/eth1_00833_20150101120010.pcap.gz', pcap_gz
+        await fs.mkdir 'data2'
+        await fs.writeFile 'data2/eth1_00832_20150101120000.pcap', pcap
+        await fs.writeFile 'data2/eth1_00833_20150101120010.pcap.gz', pcap_gz
         process.env.DATA_DIR = 'data2'
         app = munin
           web:
@@ -104,14 +104,13 @@
       after ->
         app.server.close()
         delete process.env.DATA_DIR
-        await fs.unlinkAsync 'data2/eth1_00832_20150101120000.pcap'
-        await fs.unlinkAsync 'data2/eth1_00833_20150101120010.pcap.gz'
-        await fs.rmdirAsync 'data2'
+        await fs.unlink 'data2/eth1_00832_20150101120000.pcap'
+        await fs.unlink 'data2/eth1_00833_20150101120010.pcap.gz'
+        await fs.rmdir 'data2'
 
       it 'should read pcap file', ->
         res = await req.get 'http://127.0.0.1:3941/'
         res.should.have.property 'ok', true
         res.text.should.match /^multigraph dumpcap_reasons_abs\ndumpcap_reasons_abs_200.value 0[^]*dumpcap_reasons_abs_407.value 4\n/
 
-    {promisifyAll} = require 'bluebird'
-    fs = promisifyAll require 'fs'
+    fs = (require 'fs').promises
