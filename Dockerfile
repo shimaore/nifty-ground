@@ -1,4 +1,4 @@
-FROM node:10-alpine
+FROM node:alpine
 MAINTAINER Stéphane Alnet <stephane@shimaore.net>
 
 ENV NODE_ENV production

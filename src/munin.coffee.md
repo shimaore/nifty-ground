@@ -19,7 +19,7 @@ Web Services for Munin
         total = 0
 
         try
-          input = fs.createReadStream full_name
+          input = createReadStream full_name
           input = input.pipe zlib.createGunzip() if compressed
           parser = parse input
           parser.on 'packet', ({header:{timestampSeconds},data}) ->
@@ -62,20 +62,21 @@ Since each parser opens a file, keep at most 20 of them open at any given time.
         now = new Date()
         since = new Date now - cfg.web.timespan
 
-        {count,total} = await fs
-          .readdirAsync trace_dir
-          .map (name) -> name.match /^eth[^_]+_\d+_\d+.pcap(.gz)?$/
-          .filter (m) -> m?
-          .map (m) ->
-            name = m.input
-            full_name = path.join trace_dir, name
-            compressed = m[1]?
-            {now,since,name,full_name,compressed}
-          .map parse_file, concurrency: 20
-          .reduce reducer, total: 0, count: {}
-          .catch (error) =>
-            debug "readdir/parse failed: #{error}", error.stack
-            {}
+        try
+          names = await fs.readdir trace_dir
+          data = await Promise.all( names
+            .map (name) -> name.match /^eth[^_]+_\d+_\d+.pcap(.gz)?$/
+            .filter (m) -> m?
+            .map (m) ->
+              name = m.input
+              full_name = path.join trace_dir, name
+              compressed = m[1]?
+              {now,since,name,full_name,compressed}
+            .map parse_file, concurrency: 20
+          )
+          {count,total} = data.reduce reducer, total: 0, count: {}
+        catch error
+          debug "readdir/parse failed: #{error}", error.stack
 
         unless total?
           @send ''
@@ -209,10 +210,9 @@ Munin Configuration
 Toolbox
 =======
 
-    {promisifyAll} = require 'bluebird'
     {parse} = require 'pcap-parser'
-    Zappa = require 'zappajs'
-    fs = promisifyAll require 'fs'
+    Zappa = require 'core-zappa'
+    {createReadStream,promises:fs} = require 'fs'
     path = require 'path'
     zlib = require 'zlib'
 

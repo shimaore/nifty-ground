@@ -1,8 +1,7 @@
 (c) 2012-2015 Stephane Alnet
 
     {spawn} = require('child_process')
-    {promisifyAll} = require 'bluebird'
-    fs = promisifyAll require 'fs'
+    {createReadStream,createWriteStream,promises:fs} = require 'fs'
     path = require 'path'
     zlib = require 'zlib'
     byline = require 'byline'
@@ -117,84 +116,6 @@ it will trigger three event types:
 
       run = (intf) ->
 
-        debug "run", intf
-
-We _have_ to use a file because tshark cannot read from a pipe/fifo/stdin.
-(And we need tshark for its filtering and field selection features.)
-
-        fh = "#{trace_dir}/.tmp.cap1.#{Math.random()}"
-
-# Generate a merged capture file
-
-This function tests whether a file is an acceptable input PCAP file name.
-
-        is_acceptable = (name,stats) ->
-          return no unless name.match /^[a-z].+\.pcap/
-          if intf?
-            return no unless name[0...intf.length] is intf
-          return no unless stats.isFile() and stats.size > 80
-          file_time = stats.mtime.getTime()
-          if options.find_since?
-            return no unless options.find_since < file_time
-          yes
-
-        debug "readdir #{trace_dir}"
-
-        fs.readdirAsync trace_dir
-        .then (files) ->
-
-          Promise.all files.map (name) ->
-            full_name = path.join trace_dir, name
-            debug "stat #{full_name}"
-            fs.statAsync full_name
-            .then (stats) ->
-              if is_acceptable name, stats
-                name:full_name, time:stats.mtime.getTime()
-
-The idea is that we produce _some_ input even if we can't read all the files.
-
-        .catch ->
-          null
-
-        .then (files) ->
-          files.filter (x) -> x?.time?
-
-        .then (proper_files) ->
-          proper_files.sort (a,b) -> a.time - b.time
-
-`proper_files` now contains a sorted list of *pcap* files.
-We build a stash using the last 500 packets matching `ngrep_filter`.
-
-          it = Promise.resolve []
-
-          for file in proper_files
-            do (file) ->
-              it = it
-                .then (stash) ->
-
-We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
-
-                  debug "parsing #{file.name}"
-                  input = fs.createReadStream file.name
-                  input = input.pipe zlib.createGunzip() if file.name.match /gz$/
-                  pcap_tail.tail input, options.ngrep_filter, options.ngrep_limit ? 500, stash
-
-                .catch (error) ->
-                  debug "#{error} while parsing #{file.name}"
-                  stash
-
-          it
-
-        .then (stash) ->
-          debug "Going to write #{stash.length} packets to #{fh}."
-          pcap_tail.write fs.createWriteStream(fh), stash
-          .then ->
-            run_tshark()
-
-        .catch (error) ->
-          debug "#{error} while processing #{trace_dir}"
-          null
-
         ## Select the proper packets
         tshark_command = [
           'tshark', '-r', fh, '-Y', options.tshark_filter, '-nltud', '-o', 'gui.column.format:Time,%Yut', '-T', 'fields', tshark_fields...
@@ -230,6 +151,7 @@ Locate xref
           linestream.on 'error', ->
             debug "tshark_pipe: linestream error"
             seld.end()
+          return
 
         # Wait for the pcap_command to terminate.
 
@@ -249,13 +171,80 @@ Locate xref
             clearTimeout tshark_kill_timer
             # Remove the temporary (pcap) file, it's not needed anymore.
             debug "unlink #{fh}"
-            fs.unlinkAsync fh
-            .catch (error) ->
+            try
+              await fs.unlink fh
+            catch error
               debug "unlink #{fh}: #{error}"
             # The response is complete
             self.close()
 
           tshark_pipe tshark.stdout
+          return
+
+        debug "run", intf
+
+We _have_ to use a file because tshark cannot read from a pipe/fifo/stdin.
+(And we need tshark for its filtering and field selection features.)
+
+        fh = "#{trace_dir}/.tmp.cap1.#{Math.random()}"
+
+# Generate a merged capture file
+
+This function tests whether a file is an acceptable input PCAP file name.
+
+        is_acceptable = (name,stats) ->
+          return no unless name.match /^[a-z].+\.pcap/
+          if intf?
+            return no unless name[0...intf.length] is intf
+          return no unless stats.isFile() and stats.size > 80
+          file_time = stats.mtime.getTime()
+          if options.find_since?
+            return no unless options.find_since < file_time
+          yes
+
+        debug "readdir #{trace_dir}"
+
+        try
+          files = []
+          for name in await fs.readdir trace_dir
+            await do (name) ->
+              full_name = path.join trace_dir, name
+              debug "stat #{full_name}"
+              stats = await fs.stat full_name
+              if is_acceptable name, stats
+                files.push name:full_name, time:stats.mtime.getTime()
+              return
+
+The idea is that we produce _some_ input even if we can't read all the files.
+
+          files.sort (a,b) -> a.time - b.time
+
+`proper_files` now contains a sorted list of *pcap* files.
+We build a stash using the last 500 packets matching `ngrep_filter`.
+
+          stash = []
+
+          for file in proper_files
+            await do (file_name = file.name) ->
+
+We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
+
+              try
+                debug "parsing #{file_name}"
+                input = createReadStream file_name
+                input = input.pipe zlib.createGunzip() if file_name.match /gz$/
+                await pcap_tail.tail input, options.ngrep_filter, options.ngrep_limit ? 500, stash
+
+              catch error
+                debug "#{error} while parsing #{file_name}"
+
+          debug "Going to write #{stash.length} packets to #{fh}."
+          await pcap_tail.write createWriteStream(fh), stash
+          run_tshark()
+
+        catch error
+          debug "#{error} while processing #{trace_dir}"
+          null
 
       run options.interface
 
