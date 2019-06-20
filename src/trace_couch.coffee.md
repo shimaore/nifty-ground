@@ -38,10 +38,15 @@ the request a second time.
       doc._id = [doc.type, doc.reference, doc.host].join ':'
 
       packets = await json_gather self
+
+      debug "Trace #{doc.reference} completed, savings #{packets.length} packets."
+
       doc.packets = packets
       {rev} = await dest.put doc
       doc._rev = rev
       doc.state = 'trace_completed'
+
+      debug "Trace #{doc.reference} completed, uploading #{pcap}"
 
 We cannot use CouchDB's attachment methods because they would require to store the object in memory in a Buffer.
 
