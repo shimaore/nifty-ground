@@ -17,6 +17,13 @@ the request a second time.
     debug = (require 'tangible') "nifty-ground:trace_couch"
 
     module.exports = (doc) ->
+      try
+        await handle doc
+      catch error
+        doc.error = error
+      doc
+
+    handle = (doc) ->
       debug "start", doc
       assert doc.reference?, 'The `reference` parameter is required'
 
@@ -62,6 +69,7 @@ FIXME: Retry the PUT once if it failed.
         return
 
       debug "Going to save #{pcap} to #{uri}"
-      stream.pipe req
+      output = stream.pipe req
+      output.on 'error', (error) -> console.error 'output packets.pcap', doc._id, error
       debug "Piping #{pcap} to #{uri}"
       doc
