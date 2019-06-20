@@ -22,7 +22,9 @@ Web Services for Munin
           input = createReadStream full_name
           input.on 'error', (error) -> console.error 'input', full_name, error
           if compressed
-            input = input.pipe zlib.createGunzip()
+            dec = zlib.createGunzip()
+            dec.on 'error', (error) -> console.error 'gunzip', full_name, error
+            input = input.pipe dec
             input.on 'error', (error) -> console.error 'gunzip input', full_name, error
           parser = parse input
           parser.on 'error', (error) -> console.error 'parser', full_name, error

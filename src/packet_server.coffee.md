@@ -235,7 +235,9 @@ We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
                 input = createReadStream file_name
                 input.on 'error', (error) -> console.error 'input', file_name, error
                 if file_name.match /gz$/
-                  input = input.pipe zlib.createGunzip()
+                  dec = zlib.createGunzip()
+                  dec.on 'error', (error) -> console.error 'gunzip', file_name, error
+                  input = input.pipe dec
                   input.on 'error', (error) -> console.error 'gunzip input', file_name, error
                 await pcap_tail.tail input, options.ngrep_filter, options.ngrep_limit ? 500, stash
 
