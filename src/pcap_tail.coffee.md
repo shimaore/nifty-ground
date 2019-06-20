@@ -68,7 +68,7 @@ Provides two methods on a 'stash' (Array) of packet descriptions:
           b.writeUInt32LE packet.header.capturedLength, 8
           b.writeUInt32LE packet.header.originalLength, 12
           await send b
-          await sned packet.data
+          await send packet.data
           return
 
         # Global Header
