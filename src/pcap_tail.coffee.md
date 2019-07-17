@@ -28,6 +28,10 @@ Provides two methods on a 'stash' (Array) of packet descriptions:
 
             parser = pcapp.parse input_stream
 
+            parser.on 'error', (error) ->
+              console.error 'parser', error
+              reject error
+
             parser.on 'globalHeader', (o) ->
               stash.globalHeader ?= o
 
@@ -41,10 +45,6 @@ Provides two methods on a 'stash' (Array) of packet descriptions:
 
             parser.on 'end', ->
               resolve stash
-
-            parser.on 'error', (error) ->
-              console.error 'parser', error
-              reject error
 
           catch error
             reject error

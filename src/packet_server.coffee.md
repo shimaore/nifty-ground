@@ -239,10 +239,17 @@ We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
                   dec.on 'error', (error) -> console.error 'gunzip', file_name, error
                   input = input.pipe dec
                   input.on 'error', (error) -> console.error 'gunzip input', file_name, error
+              catch error
+                debug "#{error} while opening #{file_name}"
+                return
+
+              try
                 await pcap_tail.tail input, options.ngrep_filter, options.ngrep_limit ? 500, stash
 
               catch error
                 debug "#{error} while parsing #{file_name}"
+
+              return
 
           debug "Going to write #{stash.length} packets to #{fh}."
           await pcap_tail.write createWriteStream(fh), stash
