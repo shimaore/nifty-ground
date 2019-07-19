@@ -28,7 +28,7 @@
     "nyc": "^14.1.1"
   },
   "scripts": {
-    "build": "npm install --only=dev && rm package-lock.json && coffee -c src/*.coffee.md && npm uninstall --only=dev",
+    "build": "npm install --only=dev && rm package-lock.json && coffee -c *.coffee.md src/*.coffee.md && npm uninstall --only=dev",
     "pretest": "npm run build && coffee -c test/*.coffee.md",
     "test": "mocha"
   },
