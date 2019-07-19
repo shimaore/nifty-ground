@@ -39,4 +39,4 @@ RUN mkdir /data && chown nifty-ground /data
 VOLUME /data
 
 ENTRYPOINT ["/opt/nifty-ground/docker-entrypoint.sh"]
-CMD ["/sbin/tini","-v","--","node","server.js"]
+CMD ["/sbin/tini","-v","-s","--","node","server.js"]
