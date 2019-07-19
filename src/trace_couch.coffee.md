@@ -60,7 +60,7 @@ We cannot use CouchDB's attachment methods because they would require to store t
         .accept 'json'
 
       req.on 'error', (error) ->
-        debug "put packet.pcap: #{error}"
+        debug.dev "put packet.pcap: #{error}"
 
 Note: currently this will only unlink if the PUT was successful.
 FIXME: Retry the PUT once if it failed.
@@ -70,7 +70,7 @@ FIXME: Retry the PUT once if it failed.
         try
           await fs.unlink pcap
         catch error
-          debug "#{error} while unlinking #{pcap}"
+          debug.dev "#{error} while unlinking #{pcap}"
         return
 
       debug "Going to save #{pcap} to #{uri}"

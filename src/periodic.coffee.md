@@ -14,7 +14,7 @@ FIXME should try to retrieve `new_interfaces`
         try
           cleanup()
         catch error
-          debug "Cleanup: #{error}"
+          debug.dev "Cleanup: #{error}"
       , hourly
 
     module.exports = main

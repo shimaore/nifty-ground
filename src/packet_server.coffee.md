@@ -180,7 +180,7 @@ Locate xref
             try
               await fs.unlink fh
             catch error
-              debug "unlink #{fh}: #{error}"
+              debug.dev "unlink #{fh}: #{error}"
             # The response is complete
             self.close()
 
@@ -240,14 +240,14 @@ We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
                   input = input.pipe dec
                   input.on 'error', (error) -> console.error 'gunzip input', file_name, error
               catch error
-                debug "#{error} while opening #{file_name}"
+                debug.dev "#{error} while opening #{file_name}"
                 return
 
               try
                 await pcap_tail.tail input, options.ngrep_filter, options.ngrep_limit ? 500, stash
 
               catch error
-                debug "#{error} while parsing #{file_name}"
+                debug.dev "#{error} while parsing #{file_name}"
 
               return
 
@@ -256,7 +256,7 @@ We shouldn't just crash if createReadStream, zlib, or pcap-parser fail.
           run_tshark()
 
         catch error
-          debug "#{error} while processing #{trace_dir}"
+          debug.dev "#{error} while processing #{trace_dir}"
           null
 
       run options.interface

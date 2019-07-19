@@ -82,7 +82,7 @@ Since each parser opens a file, keep at most 20 of them open at any given time.
           )
           {count,total} = data.reduce reducer, total: 0, count: {}
         catch error
-          debug "readdir/parse failed: #{error}", error.stack
+          debug.dev "readdir/parse failed: #{error}", error.stack
 
         unless total?
           @send ''
