@@ -63,8 +63,8 @@ We cannot use CouchDB's attachment methods because they would require to store t
       req.on 'error', (error) ->
         debug.dev "put packet.pcap: #{error}"
 
-      req.on 'response', (res) ->
-        debug "(Partially) done saving to #{uri}, ok=#{res.ok}, text=#{res.text}"
+      req.on 'end', ->
+        debug "Done saving to #{uri}"
         try
           await fs.unlink pcap
         catch error
