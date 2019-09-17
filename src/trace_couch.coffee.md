@@ -15,6 +15,8 @@ the request a second time.
     qs = require 'querystring'
     {createReadStream,promises:fs} = require 'fs'
     debug = (require 'tangible') "nifty-ground:trace_couch"
+    http = require 'http'
+    https = require 'https'
 
     module.exports = (doc) ->
       try
@@ -52,13 +54,18 @@ We cannot use CouchDB's attachment methods because they would require to store t
 
       stream = createReadStream pcap
 
-      uri = new URL "#{qs.escape doc._id}/packets.pcap", dest.uri+'/'
-      req = dest.agent
-        .put uri.toString()
-        .query {rev}
-        .type 'application/vnd.tcpdump.pcap'
-        .accept 'json'
-        .buffer false
+      uri = new URL "#{qs.escape doc._id}/packets.pcap?rev=#{qs.escape rev}", dest.uri+'/'
+      agent = switch uri.protocol
+        when 'http:'
+          http
+        when 'https:'
+          https
+
+      req = agent.request uri,
+        method: 'PUT'
+        headers:
+          'Content-Type': 'application/vnd.tcpdump.pcap'
+          'Accept': 'application/json'
 
       req.on 'error', (error) ->
         debug.dev "put packet.pcap: #{error}"
