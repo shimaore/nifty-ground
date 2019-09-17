@@ -53,6 +53,7 @@ the request a second time.
 We cannot use CouchDB's attachment methods because they would require to store the object in memory in a Buffer.
 
       stream = createReadStream pcap
+      stream.on 'error', (error) -> debug.error "source #{pcap}", error
 
       uri = new URL "#{qs.escape doc._id}/packets.pcap?rev=#{qs.escape rev}", dest.uri+'/'
       agent = switch uri.protocol
@@ -67,11 +68,10 @@ We cannot use CouchDB's attachment methods because they would require to store t
           'Content-Type': 'application/vnd.tcpdump.pcap'
           'Accept': 'application/json'
 
-      req.on 'error', (error) ->
-        debug.dev "put packet.pcap: #{error}"
-
-      req.on 'end', ->
-        debug "Done saving to #{uri}"
+      req.on 'socket', -> debug "put #{uri} from #{pcap}: socket"
+      req.on 'error', (error) -> debug.error "put #{uri} from #{pcap}", error
+      req.on 'close', ->
+        debug "Done saving #{pcap} to #{uri}"
         try
           await fs.unlink pcap
         catch error
@@ -80,6 +80,6 @@ We cannot use CouchDB's attachment methods because they would require to store t
 
       debug "Going to save #{pcap} to #{uri}"
       output = stream.pipe req
-      output.on 'error', (error) -> console.error 'output packets.pcap', doc._id, error
+      output.on 'error', (error) -> debug.error "output #{pcap} into #{uri}", error
       debug "Piping #{pcap} to #{uri}"
       doc
