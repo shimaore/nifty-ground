@@ -58,15 +58,13 @@ We cannot use CouchDB's attachment methods because they would require to store t
         .query {rev}
         .type 'application/vnd.tcpdump.pcap'
         .accept 'json'
+        .buffer false
 
       req.on 'error', (error) ->
         debug.dev "put packet.pcap: #{error}"
 
-Note: currently this will only unlink if the PUT was successful.
-FIXME: Retry the PUT once if it failed.
-
       req.on 'response', (res) ->
-        debug "Done saving to #{uri}, ok=#{res.ok}, text=#{res.text}"
+        debug "(Partially) done saving to #{uri}, ok=#{res.ok}, text=#{res.text}"
         try
           await fs.unlink pcap
         catch error
