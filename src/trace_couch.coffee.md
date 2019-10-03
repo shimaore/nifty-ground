@@ -9,6 +9,7 @@ the request a second time.
 
     assert = require 'assert'
     CouchDB = require 'most-couchdb'
+    dc = decodeURIComponent
 
     json_gather = require './json_gather'
     trace = require './trace'
@@ -68,7 +69,7 @@ We cannot use CouchDB's attachment methods because they would require to store t
           'Content-Type': 'application/vnd.tcpdump.pcap'
           'Accept': 'application/json'
           'Authorization': 'Basic ' + Buffer
-            .from [uri.username,uri.password].join ':'
+            .from [(dc uri.username),(dc uri.password)].join ':'
             .toString 'base64'
 
       req.on 'socket', -> debug "put #{uri} from #{pcap}: socket"
