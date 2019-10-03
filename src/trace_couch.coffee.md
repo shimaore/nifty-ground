@@ -67,7 +67,7 @@ We cannot use CouchDB's attachment methods because they would require to store t
         headers:
           'Content-Type': 'application/vnd.tcpdump.pcap'
           'Accept': 'application/json'
-          'Authorization': Buffer
+          'Authorization': 'Basic ' + Buffer
             .from [uri.username,uri.password].join ':'
             .toString 'base64'
 
