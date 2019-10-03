@@ -67,6 +67,9 @@ We cannot use CouchDB's attachment methods because they would require to store t
         headers:
           'Content-Type': 'application/vnd.tcpdump.pcap'
           'Accept': 'application/json'
+          'Authorization': Buffer
+            .from [uri.username,uri.password].join ':'
+            .toString 'base64'
 
       req.on 'socket', -> debug "put #{uri} from #{pcap}: socket"
       req.on 'error', (error) -> debug.error "put #{uri} from #{pcap}", error
