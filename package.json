@@ -14,17 +14,17 @@
     "byline": "^5.0.0",
     "ccnq4-config": "^1.0.1",
     "core-zappa": "^1.1.1",
-    "most-couchdb": "^3.3.3",
+    "most-couchdb": "^3.7.3",
     "pcap-parser": "0.2.1",
     "red-rings": "^2.0.0",
-    "red-rings-axon": "^2.1.5",
+    "red-rings-axon": "^2.2.0",
     "tangible": "^3.1.0"
   },
   "private": true,
   "devDependencies": {
     "chai": "^4.2.0",
     "coffeescript": "^2.4.1",
-    "mocha": "^6.1.4",
+    "mocha": "^6.2.1",
     "nyc": "^14.1.1"
   },
   "scripts": {
